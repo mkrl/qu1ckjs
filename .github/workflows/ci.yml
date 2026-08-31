@@ -451,9 +451,9 @@ jobs:
       - name: build
         run: |
           emcmake cmake -B build -DQJS_BUILD_WERROR=ON -DQJS_BUILD_LIBC=ON
-          emmake make -C build qjs_wasm "-j$(getconf _NPROCESSORS_ONLN)"
+          cmake --build build --target qjs_browser --parallel "$(getconf _NPROCESSORS_ONLN)"
       - name: result
-        run: ls -lh build
+        run: ls -lh build/web
   wasi:
     runs-on: ubuntu-22.04
     steps:
