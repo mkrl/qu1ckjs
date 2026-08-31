@@ -10,10 +10,10 @@ import { assert } from "./assert.js";
     const ta = new Float64Array(rab);
 
     const cases = [
-        [-1, 2],
-        [-2, 2],
-        [-3, 1],
-        [-4, 0],
+        [-1, 3],
+        [-2, 3],
+        [-3, 2],
+        [-4, 1],
         [-5, -1],
     ];
 
@@ -41,7 +41,7 @@ import { assert } from "./assert.js";
             return 6;
         }
     };
-    assert(ta.lastIndexOf(7, evil), 1);
+    assert(ta.lastIndexOf(7, evil), 2);
 }
 
 /* a fixed-length view that goes out of bounds still returns -1 */

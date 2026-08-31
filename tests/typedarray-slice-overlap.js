@@ -12,12 +12,12 @@ function check(TA) {
             return new TA(ta.buffer, 2 * TA.BYTES_PER_ELEMENT);
         }
     };
-    const result = ta.slice(1, 4);
+    const result = ta.slice(2, 5);
     assert(result.length, 4);
-    assert(result[0], 20);
     assert(result[1], 20);
     assert(result[2], 20);
-    assert(result[3], 60);
+    assert(result[3], 20);
+    assert(result[4], 60);
 }
 
 check(Float64Array);
@@ -32,17 +32,17 @@ check(Uint8Array);
             return new Int32Array(ta.buffer, 0);
         }
     };
-    const result = ta.slice(2, 5);
-    assert(result[0], 30);
-    assert(result[1], 40);
-    assert(result[2], 50);
+    const result = ta.slice(3, 6);
+    assert(result[1], 30);
+    assert(result[2], 40);
+    assert(result[3], 50);
 }
 
 /* distinct buffers keep working */
 {
     const ta = new Int32Array([1, 2, 3, 4]);
-    const result = ta.slice(1, 3);
+    const result = ta.slice(2, 4);
     assert(result.length, 2);
-    assert(result[0], 2);
-    assert(result[1], 3);
+    assert(result[1], 2);
+    assert(result[2], 3);
 }

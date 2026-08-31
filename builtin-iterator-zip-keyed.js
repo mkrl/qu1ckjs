@@ -16,8 +16,8 @@
     function closeall(iters, count) {
         let ex = undefined
         for (let i = count; i-- > 0;) {
-            let iter = iters[i]
-            iters[i] = undefined
+            let iter = iters[i + 1]
+            iters[i + 1] = undefined
             let e = close(iter)
             if (!ex) ex = e
         }
@@ -41,11 +41,12 @@
         let iters = []
         let nexts = []
         let pads = []
-        for (let key of getOwnPropertyKeys(iterables)) keys[count++] = key
+        for (let key of getOwnPropertyKeys(iterables)) keys[++count] = key
         try {
             for (let i = 0; i < count; i++) {
+            let position = i + 1
                 let del = true
-                let key = keys[i]
+            let key = keys[position]
                 // test262 goes out of its way to destroy performance here:
                 // we must only add enumerable properties but because evil
                 // getters can flip the visibility of subsequent properties,
@@ -60,8 +61,8 @@
                         check(iter, "bad iterator")
                         let method = iter[Symbol·iterator]
                         if (method) iter = call(iter, method) // iterable -> iterator
-                        iters[i] = iter
-                        nexts[i] = iter.next
+                        iters[position] = iter
+                        nexts[position] = iter.next
                         del = false
                     }
                 }
@@ -69,16 +70,17 @@
                     // splice out property; the assumption here is that the
                     // vast majority of objects don't have non-enumerable
                     // properties, or properties whose value is undefined
-                    for (let j = i+1; j < count; j++) keys[j-1] = keys[j]
+                    for (let j = position; j < count; j++) keys[j] = keys[j + 1]
+                    delete keys[count]
                     count--
                     i--
                 }
             }
             if (mode === "longest") {
                 if (padding) {
-                    for (let i = 0; i < count; i++) pads[i] = padding[keys[i]]
+                    for (let i = 1; i <= count; i++) pads[i] = padding[keys[i]]
                 } else {
-                    for (let i = 0; i < count; i++) pads[i] = undefined
+                    for (let i = 1; i <= count; i++) pads[i] = undefined
                 }
             }
         } catch (e) {
@@ -110,19 +112,20 @@
                 let values = 0
                 let results = {__proto__: null}
                 for (let i = 0; i < count; i++) {
-                    let key = keys[i]
-                    let iter = iters[i]
+                    let position = i + 1
+                    let key = keys[position]
+                    let iter = iters[position]
                     if (!iter) {
                         if (mode !== "longest") throw new InternalError("bug")
-                        results[key] = pads[i]
+                        results[key] = pads[position]
                         continue
                     }
                     let result
                     try {
-                        result = call(iter, nexts[i])
+                        result = call(iter, nexts[position])
                     } catch (e) {
                         alive = 0
-                        iters[i] = undefined
+                        iters[position] = undefined
                         closeall(iters, count)
                         throw e
                     }
@@ -139,7 +142,7 @@
                     }
                     alive--
                     dones++
-                    iters[i] = undefined
+                    iters[position] = undefined
                     switch (mode) {
                     case "shortest":
                         let ex = closeall(iters, count)
@@ -151,7 +154,7 @@
                             state = 3 // complete
                             return {value:undefined, done:true}
                         }
-                        results[key] = pads[i]
+                        results[key] = pads[position]
                         break
                     case "strict":
                         if (values > 0) {

@@ -10,10 +10,12 @@
             length = +length || 0
             result = isConstructor ? new this(length) : Array(length)
             while (i < length) {
-                let value = arrayLike[i]
+                let position = i + 1
+                let value = arrayLike[position]
                 if (sync) value = await value
-                if (mapFn) value = await mapFn.call(thisArg, value, i)
-                Object·defineProperty(result, i++, {value, configurable: true, writable: true, enumerable: true})
+                if (mapFn) value = await mapFn.call(thisArg, value, position)
+                Object·defineProperty(result, position, {value, configurable: true, writable: true, enumerable: true})
+                i++
             }
         } else {
             const iter = method.call(arrayLike)
@@ -23,8 +25,10 @@
                     let {value, done} = await iter.next()
                     if (done) break
                     if (sync) value = await value
-                    if (mapFn) value = await mapFn.call(thisArg, value, i)
-                    Object·defineProperty(result, i++, {value, configurable: true, writable: true, enumerable: true})
+                    let position = i + 1
+                    if (mapFn) value = await mapFn.call(thisArg, value, position)
+                    Object·defineProperty(result, position, {value, configurable: true, writable: true, enumerable: true})
+                    i++
                 }
             } finally {
                 if (iter.return) iter.return()

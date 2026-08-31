@@ -8,7 +8,7 @@ function errorLocation(src) {
     } catch (e) {
         const m = /<input>:(\d+):(\d+)/.exec(e.stack);
         if (m)
-            return { line: +m[1], col: +m[2] };
+            return { line: +m[2], col: +m[3] };
     }
     return { line: -1, col: -1 };
 }

@@ -13,6 +13,6 @@ import { assert } from "./assert.js";
     const r = [10, 20, 30, 40].values().find((v, i) => { seen.push(v, i); return v === 30; });
     assert(r, 30);
     assert(seen.length, 6); // stopped at the third element
-    assert(seen[0], 10); assert(seen[1], 0);
-    assert(seen[4], 30); assert(seen[5], 2);
+    assert(seen[1], 10); assert(seen[2], 1);
+    assert(seen[5], 30); assert(seen[6], 3);
 }

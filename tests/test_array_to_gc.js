@@ -22,48 +22,48 @@ function makeArrayLike(length, getterIndex) {
 
 // with
 {
-    const obj = makeArrayLike(256, 0);
-    Object.defineProperty(obj, 1, {
+    const obj = makeArrayLike(256, 1);
+    Object.defineProperty(obj, 2, {
         value: 2,
         writable: true,
         configurable: true,
     });
-    const res = Array.prototype.with.call(obj, 1, 9);
+    const res = Array.prototype.with.call(obj, 2, 9);
     assert(res.length, 256);
-    assert(res[0], 1);
-    assert(res[1], 9);
-    assert(res[2], undefined);
-    assert(res[255], undefined);
+    assert(res[1], 1);
+    assert(res[2], 9);
+    assert(res[3], undefined);
+    assert(res[256], undefined);
 }
 
 // toReversed
 {
-    const obj = makeArrayLike(256, 255);
+    const obj = makeArrayLike(256, 256);
     const res = Array.prototype.toReversed.call(obj);
     assert(res.length, 256);
-    assert(res[0], 1);
-    assert(res[1], undefined);
-    assert(res[255], undefined);
-}
-
-// toSpliced
-{
-    const obj = makeArrayLike(256, 0);
-    const res = Array.prototype.toSpliced.call(obj, 1, 0, 7);
-    assert(res.length, 257);
-    assert(res[0], 1);
-    assert(res[1], 7);
+    assert(res[1], 1);
     assert(res[2], undefined);
     assert(res[256], undefined);
 }
 
+// toSpliced
+{
+    const obj = makeArrayLike(256, 1);
+    const res = Array.prototype.toSpliced.call(obj, 2, 0, 7);
+    assert(res.length, 257);
+    assert(res[1], 1);
+    assert(res[2], 7);
+    assert(res[3], undefined);
+    assert(res[257], undefined);
+}
+
 // toSorted
 {
-    const obj = makeArrayLike(256, 0);
+    const obj = makeArrayLike(256, 1);
     const res = Array.prototype.toSorted.call(obj);
     assert(res.length, 256);
     // Sort places `undefined` at the end, so the single defined value (1) is first.
-    assert(res[0], 1);
-    assert(res[1], undefined);
-    assert(res[255], undefined);
+    assert(res[1], 1);
+    assert(res[2], undefined);
+    assert(res[256], undefined);
 }

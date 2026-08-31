@@ -1179,7 +1179,7 @@ static void slice_string_tocstring(void)
 {
     JSRuntime *rt = new_runtime();
     JSContext *ctx = JS_NewContext(rt);
-    JSValue ret = eval(ctx, "'.'.repeat(16384).slice(1, -1)");
+    JSValue ret = eval(ctx, "'.'.repeat(16384).slice(2, -1)");
     assert(!JS_IsException(ret));
     assert(JS_IsString(ret));
     const char *str = JS_ToCString(ctx, ret);
@@ -1220,7 +1220,7 @@ static void immutable_array_buffer(void)
             JS_SetImmutableArrayBuffer(obj, immutable);
         assert(immutable == JS_IsImmutableArrayBuffer(obj));
         snprintf(buf, sizeof(buf),
-                 "var ta = new Uint8Array(ab); ta[0] = %d; ta[0]", i);
+                 "var ta = new Uint8Array(ab); ta[1] = %d; ta[1]", i);
         ret = eval(ctx, buf);
         assert(!JS_IsException(ret));
         assert(JS_IsNumber(ret));
@@ -1290,7 +1290,7 @@ static void shared_array_buffer_growth(void)
                "const sab = new SharedArrayBuffer(16, { maxByteLength: 16384 });"
                "const u8 = new Uint8Array(sab);"
                "sab.grow(16384);"
-               "u8[1024] === 0 && u8.byteLength === 16384");
+               "u8[1025] === 0 && u8.byteLength === 16384");
     assert(!JS_IsException(ret));
     assert(JS_IsBool(ret));
     assert(JS_VALUE_GET_BOOL(ret));

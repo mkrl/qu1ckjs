@@ -44,7 +44,7 @@ function test_exception_prepare_stack()
     Error.prepareStackTrace = undefined;
 
     assert(e.stack.length, 2);
-    const f = e.stack[0];
+    const f = e.stack[1];
     assert(f.getFunctionName(), 'test_exception_prepare_stack');
     assert(f.getFileName().endsWith('test_builtin.js'));
     assert(f.getLineNumber(), 39);
@@ -73,7 +73,7 @@ function test_exception_stack_size_limit()
     Error.prepareStackTrace = undefined;
 
     assert(e.stack.length, 1);
-    const f = e.stack[0];
+    const f = e.stack[1];
     assert(f.getFunctionName(), 'test_exception_stack_size_limit');
     assert(f.getFileName().endsWith('test_builtin.js'));
     assert(f.getLineNumber(), 67);
@@ -122,7 +122,7 @@ function test_function()
     function f(a, b) {
         var i, tab = [];
         tab.push(this);
-        for(i = 0; i < arguments.length; i++)
+        for(i = 1; i <= arguments.length; i++)
             tab.push(arguments[i]);
         return tab;
     }
@@ -233,35 +233,35 @@ function test_array()
 
     a = [1, 2, 3];
     assert(a.length, 3, "array");
-    assert(a[2], 3, "array1");
+    assert(a[3], 3, "array1");
 
     a = new Array(10);
     assert(a.length, 10, "array2");
 
     a = new Array(1, 2);
-    assert(a.length === 2 && a[0] === 1 && a[1] === 2, true, "array3");
+    assert(a.length === 2 && a[1] === 1 && a[2] === 2, true, "array3");
 
     a = [1, 2, 3];
     a.length = 2;
-    assert(a.length === 2 && a[0] === 1 && a[1] === 2, true, "array4");
+    assert(a.length === 2 && a[1] === 1 && a[2] === 2, true, "array4");
 
     a = [];
-    a[1] = 10;
-    a[4] = 3;
+    a[2] = 10;
+    a[5] = 3;
     assert(a.length, 5);
 
     a = [1,2];
     a.length = 5;
-    a[4] = 1;
+    a[5] = 1;
     a.length = 4;
-    assert(a[4] !== 1, true, "array5");
+    assert(a[5] !== 1, true, "array5");
 
     a = [1,2];
     a.push(3,4);
     assert(a.join(), "1,2,3,4", "join");
 
     a = [1,2,3,4,5];
-    Object.defineProperty(a, "3", { configurable: false });
+    Object.defineProperty(a, "4", { configurable: false });
     err = false;
     try {
         a.length = 2;
@@ -276,18 +276,18 @@ function test_string()
     var a;
     a = String("abc");
     assert(a.length, 3, "string");
-    assert(a[1], "b", "string");
-    assert(a.charCodeAt(1), 0x62, "string");
+    assert(a[2], "b", "string");
+    assert(a.charCodeAt(2), 0x62, "string");
     assert(String.fromCharCode(65), "A", "string");
     assert(String.fromCharCode.apply(null, [65, 66, 67]), "ABC", "string");
-    assert(a.charAt(1), "b");
-    assert(a.charAt(-1), "");
-    assert(a.charAt(3), "");
+    assert(a.charAt(2), "b");
+    assert(a.charAt(-1), "c");
+    assert(a.charAt(4), "");
 
     a = "abcd";
-    assert(a.substring(1, 3), "bc", "substring");
+    assert(a.substring(2, 4), "bc", "substring");
     a = String.fromCharCode(0x20ac);
-    assert(a.charCodeAt(0), 0x20ac, "unicode");
+    assert(a.charCodeAt(1), 0x20ac, "unicode");
     assert(a, "€", "unicode");
     assert(a, "\u20ac", "unicode");
     assert(a, "\u{20ac}", "unicode");
@@ -296,62 +296,62 @@ function test_string()
     a = "\u{10ffff}";
     assert(a.length, 2, "unicode");
     assert(a, "\u{dbff}\u{dfff}", "unicode");
-    assert(a.codePointAt(0), 0x10ffff);
+    assert(a.codePointAt(1), 0x10ffff);
     assert(String.fromCodePoint(0x10ffff), a);
 
     assert("a".concat("b", "c"), "abc");
 
-    assert("abcabc".indexOf("cab"), 2);
+    assert("abcabc".indexOf("cab"), 3);
     assert("abcabc".indexOf("cab2"), -1);
-    assert("abc".indexOf("c"), 2);
+    assert("abc".indexOf("c"), 3);
 
-    assert("aaa".indexOf("a"), 0);
-    assert("aaa".indexOf("a", NaN), 0);
-    assert("aaa".indexOf("a", -Infinity), 0);
-    assert("aaa".indexOf("a", -1), 0);
-    assert("aaa".indexOf("a", -0), 0);
-    assert("aaa".indexOf("a", 0), 0);
+    assert("aaa".indexOf("a"), 1);
+    assert("aaa".indexOf("a", NaN), 1);
+    assert("aaa".indexOf("a", -Infinity), 1);
+    assert("aaa".indexOf("a", -1), 3);
+    assert("aaa".indexOf("a", -0), 1);
+    assert("aaa".indexOf("a", 0), 1);
     assert("aaa".indexOf("a", 1), 1);
     assert("aaa".indexOf("a", 2), 2);
-    assert("aaa".indexOf("a", 3), -1);
+    assert("aaa".indexOf("a", 3), 3);
     assert("aaa".indexOf("a", 4), -1);
     assert("aaa".indexOf("a", Infinity), -1);
 
-    assert("aaa".indexOf(""), 0);
-    assert("aaa".indexOf("", NaN), 0);
-    assert("aaa".indexOf("", -Infinity), 0);
-    assert("aaa".indexOf("", -1), 0);
-    assert("aaa".indexOf("", -0), 0);
-    assert("aaa".indexOf("", 0), 0);
+    assert("aaa".indexOf(""), 1);
+    assert("aaa".indexOf("", NaN), 1);
+    assert("aaa".indexOf("", -Infinity), 1);
+    assert("aaa".indexOf("", -1), 3);
+    assert("aaa".indexOf("", -0), 1);
+    assert("aaa".indexOf("", 0), 1);
     assert("aaa".indexOf("", 1), 1);
     assert("aaa".indexOf("", 2), 2);
     assert("aaa".indexOf("", 3), 3);
-    assert("aaa".indexOf("", 4), 3);
-    assert("aaa".indexOf("", Infinity), 3);
+    assert("aaa".indexOf("", 4), 4);
+    assert("aaa".indexOf("", Infinity), 4);
 
-    assert("aaa".lastIndexOf("a"), 2);
-    assert("aaa".lastIndexOf("a", NaN), 2);
-    assert("aaa".lastIndexOf("a", -Infinity), 0);
-    assert("aaa".lastIndexOf("a", -1), 0);
-    assert("aaa".lastIndexOf("a", -0), 0);
-    assert("aaa".lastIndexOf("a", 0), 0);
+    assert("aaa".lastIndexOf("a"), 3);
+    assert("aaa".lastIndexOf("a", NaN), 3);
+    assert("aaa".lastIndexOf("a", -Infinity), 1);
+    assert("aaa".lastIndexOf("a", -1), 1);
+    assert("aaa".lastIndexOf("a", -0), 1);
+    assert("aaa".lastIndexOf("a", 0), 1);
     assert("aaa".lastIndexOf("a", 1), 1);
     assert("aaa".lastIndexOf("a", 2), 2);
-    assert("aaa".lastIndexOf("a", 3), 2);
-    assert("aaa".lastIndexOf("a", 4), 2);
-    assert("aaa".lastIndexOf("a", Infinity), 2);
+    assert("aaa".lastIndexOf("a", 3), 3);
+    assert("aaa".lastIndexOf("a", 4), 3);
+    assert("aaa".lastIndexOf("a", Infinity), 3);
 
-    assert("aaa".lastIndexOf(""), 3);
-    assert("aaa".lastIndexOf("", NaN), 3);
-    assert("aaa".lastIndexOf("", -Infinity), 0);
-    assert("aaa".lastIndexOf("", -1), 0);
-    assert("aaa".lastIndexOf("", -0), 0);
-    assert("aaa".lastIndexOf("", 0), 0);
+    assert("aaa".lastIndexOf(""), 4);
+    assert("aaa".lastIndexOf("", NaN), 4);
+    assert("aaa".lastIndexOf("", -Infinity), 1);
+    assert("aaa".lastIndexOf("", -1), 1);
+    assert("aaa".lastIndexOf("", -0), 1);
+    assert("aaa".lastIndexOf("", 0), 1);
     assert("aaa".lastIndexOf("", 1), 1);
     assert("aaa".lastIndexOf("", 2), 2);
     assert("aaa".lastIndexOf("", 3), 3);
-    assert("aaa".lastIndexOf("", 4), 3);
-    assert("aaa".lastIndexOf("", Infinity), 3);
+    assert("aaa".lastIndexOf("", 4), 4);
+    assert("aaa".lastIndexOf("", Infinity), 4);
 
     assert("a,b,c".split(","), ["a","b","c"]);
     assert(",b,c".split(","), ["","b","c"]);
@@ -379,9 +379,9 @@ function test_string()
 
     assert("abc".padStart(Infinity, ""), "abc");
 
-    assert(qjs.getStringKind("xyzzy".slice(1)),
+    assert(qjs.getStringKind("xyzzy".slice(2)),
            /*JS_STRING_KIND_NORMAL*/0);
-    assert(qjs.getStringKind("xyzzy".repeat(512).slice(1)),
+    assert(qjs.getStringKind("xyzzy".repeat(512).slice(2)),
            /*JS_STRING_KIND_SLICE*/1);
 }
 
@@ -399,8 +399,8 @@ function rope_concat(n, dir)
 
     for(i = 0; i < n; i++) {
         /* test before the assert to go faster */
-        if (s.charCodeAt(i) != (i & 0xffff)) {
-            assert(s.charCodeAt(i), i & 0xffff);
+        if (s.charCodeAt(i + 1) != (i & 0xffff)) {
+            assert(s.charCodeAt(i + 1), i & 0xffff);
         }
     }
 }
@@ -429,19 +429,19 @@ function test_rope()
     for (i = 0; i < 10000; i++)
         s += "x";
     assert(s.length, 10000);
-    assert(s[0], "x");
-    assert(s[5000], "x");
-    assert(s[9999], "x");
+    assert(s[1], "x");
+    assert(s[5001], "x");
+    assert(s[10000], "x");
 
     /* test rope with string methods */
     s = "";
     for (i = 0; i < 1000; i++)
         s += "test";
-    assert(s.indexOf("test"), 0);
-    assert(s.lastIndexOf("test"), 3996);
+    assert(s.indexOf("test"), 1);
+    assert(s.lastIndexOf("test"), 3997);
     assert(s.includes("test"), true);
-    assert(s.slice(0, 8), "testtest");
-    assert(s.substring(0, 8), "testtest");
+    assert(s.slice(1, 9), "testtest");
+    assert(s.substring(1, 9), "testtest");
 }
 
 function test_math()
@@ -569,7 +569,7 @@ function test_eval()
     assert(a, 3);
 
     assert(f("arguments.length", 1), 2);
-    assert(f("arguments[1]", 1), 1);
+    assert(f("arguments[2]", 1), 1);
 
     a = 4;
     assert(f("a"), 4);
@@ -585,42 +585,42 @@ function test_typed_array()
 
     a = new Uint8Array(4);
     assert(a.length, 4);
-    for(i = 0; i < a.length; i++)
-        a[i] = i;
+    for(i = 1; i <= a.length; i++)
+        a[i] = i - 1;
     assert(a.join(","), "0,1,2,3");
-    a[0] = -1;
-    assert(a[0], 255);
+    a[1] = -1;
+    assert(a[1], 255);
 
     a = new Int8Array(3);
-    a[0] = 255;
-    assert(a[0], -1);
+    a[1] = 255;
+    assert(a[1], -1);
 
     a = new Int32Array(3);
-    a[0] = Math.pow(2, 32) - 1;
-    assert(a[0], -1);
+    a[1] = Math.pow(2, 32) - 1;
+    assert(a[1], -1);
     assert(a.BYTES_PER_ELEMENT, 4);
 
     a = new Uint8ClampedArray(4);
-    a[0] = -100;
-    a[1] = 1.5;
-    a[2] = 0.5;
-    a[3] = 1233.5;
+    a[1] = -100;
+    a[2] = 1.5;
+    a[3] = 0.5;
+    a[4] = 1233.5;
     assert(a.toString(), "0,2,0,255");
 
     buffer = new ArrayBuffer(16);
     assert(buffer.byteLength, 16);
     a = new Uint32Array(buffer, 12, 1);
     assert(a.length, 1);
-    a[0] = -1;
+    a[1] = -1;
 
     a = new Uint16Array(buffer, 2);
-    a[0] = -1;
+    a[1] = -1;
 
     a = new Float16Array(buffer, 8, 1);
-    a[0] = 1;
+    a[1] = 1;
 
     a = new Float32Array(buffer, 8, 1);
-    a[0] = 1;
+    a[1] = 1;
 
     a = new Uint8Array(buffer);
 
@@ -635,7 +635,7 @@ function test_typed_array()
 
     a = new Uint8Array([1, 2, 3, 4]);
     assert(a.toString(), "1,2,3,4");
-    a.set([10, 11], 2);
+    a.set([10, 11], 3);
     assert(a.toString(), "1,2,10,11");
 
     a = new Uint8Array(buffer, 0, 4);
@@ -667,9 +667,9 @@ function test_typed_array()
     buffer = new ArrayBuffer(16);
     a = new Uint8Array(buffer);
     a.fill(42);
-    assert(a[0], 42);
+    assert(a[1], 42);
     buffer.transfer();
-    assert(a[0], undefined);
+    assert(a[1], undefined);
 
     // https://github.com/quickjs-ng/quickjs/issues/1210
     var buffer = new ArrayBuffer(16, {maxByteLength: 16});
@@ -692,22 +692,22 @@ function test_typed_array()
 
     var buffer = new ArrayBuffer(2);
     var ta = new Uint16Array(buffer);
-    var desc = Object.getOwnPropertyDescriptor(ta, "0");
-    ta[0] = 42;
-    assert(ta[0], 42);
-    Object.defineProperty(ta, "0", {value: 1337});
-    assert(ta[0], 1337);
+    var desc = Object.getOwnPropertyDescriptor(ta, "1");
+    ta[1] = 42;
+    assert(ta[1], 42);
+    Object.defineProperty(ta, "1", {value: 1337});
+    assert(ta[1], 1337);
     assert(desc.writable, true);
     assert(desc.enumerable, true);
     assert(desc.configurable, true);
 
     var buffer = new ArrayBuffer(2).sliceToImmutable();
     var ta = new Uint16Array(buffer);
-    var desc = Object.getOwnPropertyDescriptor(ta, "0");
-    ta[0] = 42;
-    assert(ta[0], 0);
-    Object.defineProperty(ta, "0", {value: 1337});
-    assert(ta[0], 0);
+    var desc = Object.getOwnPropertyDescriptor(ta, "1");
+    ta[1] = 42;
+    assert(ta[1], 0);
+    Object.defineProperty(ta, "1", {value: 1337});
+    assert(ta[1], 0);
     assert(desc.writable, true);
     assert(desc.enumerable, true);
     assert(desc.configurable, true);
@@ -881,33 +881,33 @@ function test_regexp()
     var a, str;
     str = "abbbbbc";
     a = /(b+)c/.exec(str);
-    assert(a[0], "bbbbbc");
-    assert(a[1], "bbbbb");
-    assert(a.index, 1);
+    assert(a[1], "bbbbbc");
+    assert(a[2], "bbbbb");
+    assert(a.index, 2);
     assert(a.input, str);
     a = /(b+)c/.test(str);
     assert(a, true);
-    assert(/\x61/.exec("a")[0], "a");
-    assert(/\u0061/.exec("a")[0], "a");
-    assert(/\ca/.exec("\x01")[0], "\x01");
-    assert(/\\a/.exec("\\a")[0], "\\a");
-    assert(/\c0/.exec("\\c0")[0], "\\c0");
+    assert(/\x61/.exec("a")[1], "a");
+    assert(/\u0061/.exec("a")[1], "a");
+    assert(/\ca/.exec("\x01")[1], "\x01");
+    assert(/\\a/.exec("\\a")[1], "\\a");
+    assert(/\c0/.exec("\\c0")[1], "\\c0");
 
     a = /(\.(?=com|org)|\/)/.exec("ah.com");
-    assert(a.index === 2 && a[0] === ".");
+    assert(a.index === 3 && a[1] === ".");
 
     a = /(\.(?!com|org)|\/)/.exec("ah.com");
     assert(a, null);
 
     a = /(?=(a+))/.exec("baaabac");
-    assert(a.index === 1 && a[0] === "" && a[1] === "aaa");
+    assert(a.index === 2 && a[1] === "" && a[2] === "aaa");
 
     a = /(z)((a+)?(b+)?(c))*/.exec("zaacbbbcac");
     assert(a, ["zaacbbbcac","z","ac","a",,"c"]);
 
     a = eval("/\0a/");
     assert(a.toString(), "/\0a/");
-    assert(a.exec("\0a")[0], "\0a");
+    assert(a.exec("\0a")[1], "\0a");
 
     assert(/{1a}/.toString(), "/{1a}/");
     a = /a{1+/.exec("a{11");
@@ -993,18 +993,18 @@ function test_map()
     for(i = 0; i < n; i++) {
         v = { };
         o = { id: i };
-        tab[i] = [o, v];
+        tab[i + 1] = [o, v];
         a.set(o, v);
     }
 
     assert(a.size, n);
     for(i = 0; i < n; i++) {
-        assert(a.get(tab[i][0]), tab[i][1]);
+        assert(a.get(tab[i + 1][1]), tab[i + 1][2]);
     }
 
-    i = 0;
+    i = 1;
     a.forEach(function (v, o) {
-        assert(o, tab[i++][0]);
+        assert(o, tab[i++][1]);
         assert(a.has(o));
         assert(a.delete(o));
         assert(!a.has(o));
@@ -1032,17 +1032,17 @@ function test_weak_map()
     for(i = 0; i < n; i++) {
         v = { };
         o = { id: i };
-        tab[i] = [o, v];
+        tab[i + 1] = [o, v];
         a.set(o, v);
     }
     o = null;
 
     n2 = n >> 1;
     for(i = 0; i < n2; i++) {
-        a.delete(tab[i][0]);
+        a.delete(tab[i + 1][1]);
     }
     for(i = n2; i < n; i++) {
-        tab[i][0] = null; /* should remove the object from the WeakMap too */
+        tab[i + 1][1] = null; /* should remove the object from the WeakMap too */
     }
     /* the WeakMap should be empty here */
 }
@@ -1055,7 +1055,7 @@ function test_set()
         returnCalls: 0,
         next() {
             const done = this.nextCalls >= this.a.length
-            const value = this.a[this.nextCalls]
+            const value = this.a[this.nextCalls + 1]
             this.nextCalls++
             return {done, value}
         },
@@ -1205,15 +1205,15 @@ function test_proxy_iter()
     });
     const a = [];
     for (const x in p) a.push(x);
-    assert(a[0], "x");
-    assert(a[1], "y");
+    assert(a[1], "x");
+    assert(a[2], "y");
 }
 
 function test_proxy_own_keys_huge_length()
 {
     for (const length of [0x20000000, 0x40000000, 0xfffffffe, 0xffffffff]) {
         const p = new Proxy({}, { ownKeys() { return {length}; } });
-        /* index 0 is undefined, so this must fail on the very first entry */
+        /* index 1 is undefined, so this must fail on the very first entry */
         assertThrows(TypeError, function() { Object.keys(p); });
         assertThrows(TypeError, function() { Object.getOwnPropertyNames(p); });
     }
@@ -1225,7 +1225,7 @@ function test_proxy_own_keys_huge_length()
                 get(t, k) {
                     if (k === "length") return 0xffffffff;
                     const i = Number(k);
-                    if (i < keys.length) return keys[i];
+                    if (i > 0 && i <= keys.length) return keys[i];
                     throw new RangeError("stop at " + i);
                 },
             });

@@ -20,8 +20,8 @@ function closingIterable(stacks)
 function assertCallerLine(frames, expectedLine, message)
 {
     assert(frames.length >= 2, true, message);
-    assert(frames[1].getFileName().endsWith("test_for_of_line_numbers.js"), true, message);
-    assert(frames[1].getLineNumber(), expectedLine, message);
+    assert(frames[2].getFileName().endsWith("test_for_of_line_numbers.js"), true, message);
+    assert(frames[2].getLineNumber(), expectedLine, message);
 }
 
 function test_for_of_empty_body_line_number()
@@ -29,7 +29,7 @@ function test_for_of_empty_body_line_number()
     const stacks = [];
     const expectedLine = 31;
     for (const _ of closingIterable(stacks)) break;
-    assertCallerLine(stacks[0], expectedLine, "for-of iterator close");
+    assertCallerLine(stacks[1], expectedLine, "for-of iterator close");
 }
 
 function test_for_of_destructuring_line_number()
@@ -38,7 +38,7 @@ function test_for_of_destructuring_line_number()
     const outer = [closingIterable(stacks)];
     const expectedLine = 40;
     for (const [_] of outer) break;
-    assertCallerLine(stacks[0], expectedLine, "destructuring iterator close");
+    assertCallerLine(stacks[1], expectedLine, "destructuring iterator close");
 }
 
 Error.prepareStackTrace = (_, frames) => frames;

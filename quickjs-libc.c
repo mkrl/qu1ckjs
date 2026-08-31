@@ -2125,8 +2125,8 @@ static JSValue js_os_ttyGetWinSize(JSContext *ctx, JSValueConst this_val,
     obj = JS_NewArray(ctx);
     if (JS_IsException(obj))
         return obj;
-    JS_DefinePropertyValueUint32(ctx, obj, 0, JS_NewInt32(ctx, info.dwSize.X), JS_PROP_C_W_E);
-    JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, info.dwSize.Y), JS_PROP_C_W_E);
+    JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, info.dwSize.X), JS_PROP_C_W_E);
+    JS_DefinePropertyValueUint32(ctx, obj, 2, JS_NewInt32(ctx, info.dwSize.Y), JS_PROP_C_W_E);
     return obj;
 }
 
@@ -2166,8 +2166,8 @@ static JSValue js_os_ttyGetWinSize(JSContext *ctx, JSValueConst this_val,
         obj = JS_NewArray(ctx);
         if (JS_IsException(obj))
             return obj;
-        JS_DefinePropertyValueUint32(ctx, obj, 0, JS_NewInt32(ctx, ws.ws_col), JS_PROP_C_W_E);
-        JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, ws.ws_row), JS_PROP_C_W_E);
+        JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, ws.ws_col), JS_PROP_C_W_E);
+        JS_DefinePropertyValueUint32(ctx, obj, 2, JS_NewInt32(ctx, ws.ws_row), JS_PROP_C_W_E);
         return obj;
     } else {
         return JS_NULL;
@@ -3090,10 +3090,10 @@ static JSValue js_os_readdir(JSContext *ctx, JSValueConst this_val,
         err = GetLastError();
     if (err)
         goto done;
-    JS_DefinePropertyValueUint32(ctx, obj, 0, JS_NewString(ctx, "."),
+    JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewString(ctx, "."),
                                  JS_PROP_C_W_E);
     for (len = 1; FindNextFileA(h, &d); len++) {
-        JS_DefinePropertyValueUint32(ctx, obj, len,
+        JS_DefinePropertyValueUint32(ctx, obj, len + 1,
                                      JS_NewString(ctx, d.cFileName),
                                      JS_PROP_C_W_E);
     }
@@ -3132,7 +3132,7 @@ done:
             err = errno;
             break;
         }
-        JS_DefinePropertyValueUint32(ctx, obj, len++,
+        JS_DefinePropertyValueUint32(ctx, obj, ++len,
                                      JS_NewString(ctx, d->d_name),
                                      JS_PROP_C_W_E);
     }
@@ -3600,7 +3600,7 @@ static JSValue js_os_exec(JSContext *ctx, JSValueConst this_val,
     if (!exec_argv)
         return JS_EXCEPTION;
     for(i = 0; i < exec_argc; i++) {
-        val = JS_GetPropertyUint32(ctx, args, i);
+        val = JS_GetPropertyUint32(ctx, args, i + 1);
         if (JS_IsException(val))
             goto exception;
         str = JS_ToCString(ctx, val);
@@ -3844,9 +3844,9 @@ static JSValue js_os_waitpid(JSContext *ctx, JSValueConst this_val,
     obj = JS_NewArray(ctx);
     if (JS_IsException(obj))
         return obj;
-    JS_DefinePropertyValueUint32(ctx, obj, 0, JS_NewInt32(ctx, ret),
+    JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, ret),
                                  JS_PROP_C_W_E);
-    JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, status),
+    JS_DefinePropertyValueUint32(ctx, obj, 2, JS_NewInt32(ctx, status),
                                  JS_PROP_C_W_E);
     return obj;
 }
@@ -3864,9 +3864,9 @@ static JSValue js_os_pipe(JSContext *ctx, JSValueConst this_val,
     obj = JS_NewArray(ctx);
     if (JS_IsException(obj))
         return obj;
-    JS_DefinePropertyValueUint32(ctx, obj, 0, JS_NewInt32(ctx, pipe_fds[0]),
+    JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, pipe_fds[0]),
                                  JS_PROP_C_W_E);
-    JS_DefinePropertyValueUint32(ctx, obj, 1, JS_NewInt32(ctx, pipe_fds[1]),
+    JS_DefinePropertyValueUint32(ctx, obj, 2, JS_NewInt32(ctx, pipe_fds[1]),
                                  JS_PROP_C_W_E);
     return obj;
 }
@@ -4617,7 +4617,7 @@ void js_std_add_helpers(JSContext *ctx, int argc, char **argv)
     if (argc >= 0) {
         args = JS_NewArray(ctx);
         for(i = 0; i < argc; i++) {
-            JS_SetPropertyUint32(ctx, args, i, JS_NewString(ctx, argv[i]));
+            JS_SetPropertyUint32(ctx, args, i + 1, JS_NewString(ctx, argv[i]));
         }
         JS_SetPropertyStr(ctx, global_obj, "scriptArgs", args);
     }

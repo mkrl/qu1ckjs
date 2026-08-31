@@ -178,8 +178,8 @@ function test_inc_dec()
     assert(a.x, 0, "--");
 
     a = [true];
-    a[0]++;
-    assert(a[0], 2, "++");
+    a[1]++;
+    assert(a[1], 2, "++");
 
     a = {x:true};
     r = a.x++;
@@ -190,12 +190,12 @@ function test_inc_dec()
     assert(r === 1 && a.x === 0, true, "--");
 
     a = [true];
-    r = a[0]++;
-    assert(r === 1 && a[0] === 2, true, "++");
+    r = a[1]++;
+    assert(r === 1 && a[1] === 2, true, "++");
 
     a = [true];
-    r = a[0]--;
-    assert(r === 1 && a[0] === 0, true, "--");
+    r = a[1]--;
+    assert(r === 1 && a[1] === 0, true, "--");
 }
 
 function F(x)
@@ -283,8 +283,8 @@ function test_arguments()
 {
     function f2() {
         assert(arguments.length, 2, "arguments");
-        assert(arguments[0], 1, "arguments");
-        assert(arguments[1], 3, "arguments");
+        assert(arguments[1], 1, "arguments");
+        assert(arguments[2], 3, "arguments");
     }
     f2(1, 3);
 
@@ -453,7 +453,7 @@ function test_spread()
     assert(x.toString(), "1,2,3,4");
 
     x = [ ...[ , ] ];
-    assert(Object.getOwnPropertyNames(x).toString(), "0,length");
+    assert(Object.getOwnPropertyNames(x).toString(), "1,length");
 }
 
 function test_function_length()
@@ -474,17 +474,17 @@ function test_argument_scope()
     if (typeof require === 'undefined')
         assert_throws(SyntaxError, f);
 
-    f = function(a = eval("1"), b = arguments[0]) { return b; };
+    f = function(a = eval("1"), b = arguments[1]) { return b; };
     assert(f(12), 12);
 
-    f = function(a, b = arguments[0]) { return b; };
+    f = function(a, b = arguments[1]) { return b; };
     assert(f(12), 12);
 
     f = function(a, b = () => arguments) { return b; };
-    assert(f(12)()[0], 12);
+    assert(f(12)()[1], 12);
 
     f = function(a = eval("1"), b = () => arguments) { return b; };
-    assert(f(12)()[0], 12);
+    assert(f(12)()[1], 12);
 
     (function() {
         "use strict";

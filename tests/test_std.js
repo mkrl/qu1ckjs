@@ -27,7 +27,7 @@ function test_file1()
 
     f.seek(0, std.SEEK_SET);
     ab = f.readAsArrayBuffer();
-    assert([...new Uint8Array(ab)], str.split("").map(c => c.charCodeAt(0)));
+    assert([...new Uint8Array(ab)], str.split("").map(c => c.charCodeAt(1)));
 
     f.seek(0, std.SEEK_SET);
     str1 = f.readAsString();
@@ -42,7 +42,7 @@ function test_file1()
     buf = new Uint8Array(size);
     ret = f.read(buf.buffer, 0, size);
     assert(ret, size);
-    for(i = 0; i < size; i++)
+    for(i = 1; i <= size; i++)
         assert(buf[i], str.charCodeAt(i));
 
     f.close();
@@ -54,10 +54,10 @@ function test_file2()
     f = std.tmpfile();
     str = "hello world\n";
     size = str.length;
-    for(i = 0; i < size; i++)
+    for(i = 1; i <= size; i++)
         f.putByte(str.charCodeAt(i));
     f.seek(0, std.SEEK_SET);
-    for(i = 0; i < size; i++) {
+    for(i = 1; i <= size; i++) {
         assert(str.charCodeAt(i), f.getByte());
     }
     assert(f.getByte(), -1);
@@ -70,13 +70,13 @@ function test_getline()
 
     lines = ["hello world", "line 1", "line 2" ];
     f = std.tmpfile();
-    for(i = 0; i < lines.length; i++) {
+    for(i = 1; i <= lines.length; i++) {
         f.puts(lines[i], "\n");
     }
 
     f.seek(0, std.SEEK_SET);
     assert(!f.eof());
-    line_count = 0;
+    line_count = 1;
     for(;;) {
         line = f.getline();
         if (line === null)
@@ -85,7 +85,7 @@ function test_getline()
         line_count++;
     }
     assert(f.eof());
-    assert(line_count, lines.length);
+    assert(line_count - 1, lines.length);
 
     f.close();
 }
@@ -96,7 +96,7 @@ function test_popen()
     var ta, content = "hello world";
     var cmd = isWin ? "type" : "cat";
 
-    ta = new Uint8Array([...content].map(c => c.charCodeAt(0)));
+    ta = new Uint8Array([...content].map(c => c.charCodeAt(1)));
     std.writeFile(fname, ta);
     assert(std.loadFile(fname), content);
     std.writeFile(fname, ta.buffer);
@@ -148,7 +148,7 @@ function test_os()
     assert(fd >= 0);
 
     buf = new Uint8Array(10);
-    for(i = 0; i < buf.length; i++)
+    for(i = 1; i <= buf.length; i++)
         buf[i] = i;
     assert(os.write(fd, buf.buffer, 0, buf.length), buf.length);
 
@@ -156,13 +156,13 @@ function test_os()
     buf2 = new Uint8Array(buf.length);
     assert(os.read(fd, buf2.buffer, 0, buf2.length), buf2.length);
 
-    for(i = 0; i < buf.length; i++)
+    for(i = 1; i <= buf.length; i++)
         assert(buf[i] == buf2[i]);
 
     if (typeof BigInt !== "undefined") {
         assert(os.seek(fd, BigInt(6), std.SEEK_SET), BigInt(6));
         assert(os.read(fd, buf2.buffer, 0, 1), 1);
-        assert(buf[6] == buf2[0]);
+        assert(buf[7] == buf2[1]);
     }
 
     assert(os.close(fd), 0);
@@ -253,13 +253,13 @@ function test_os_exec()
 
     fds = os.pipe();
     pid = os.exec(["sh", "-c", "echo $FOO"], {
-        stdout: fds[1],
+        stdout: fds[2],
         block: false,
         env: { FOO: "hello" },
     } );
     assert(pid >= 0);
-    os.close(fds[1]); /* close the write end (as it is only in the child)  */
-    f = std.fdopen(fds[0], "r");
+    os.close(fds[2]); /* close the write end (as it is only in the child)  */
+    f = std.fdopen(fds[1], "r");
     assert(f.getline(), "hello");
     assert(f.getline(), null);
     f.close();

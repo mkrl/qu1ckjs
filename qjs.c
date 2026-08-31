@@ -243,7 +243,7 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
     JSValue args = JS_NewArray(ctx);
     int i;
     for(i = 0; i < qjs__argc; i++) {
-        JS_SetPropertyUint32(ctx, args, i, JS_NewString(ctx, qjs__argv[i]));
+        JS_SetPropertyUint32(ctx, args, i + 1, JS_NewString(ctx, qjs__argv[i]));
     }
     JS_SetPropertyStr(ctx, global, "execArgv", args);
     JS_SetPropertyStr(ctx, global, "argv0", JS_NewString(ctx, qjs__argv[0]));

@@ -12,9 +12,9 @@ import { assert } from "./assert.js";
     std.gc();
     for (const a of keep) {
         assert(a.length, 246);
-        assert(a[0], 0);
-        assert(a[245], 2);
-        assert(a.hasOwnProperty(1), false);
+        assert(a[1], 0);
+        assert(a[246], 2);
+        assert(a.hasOwnProperty(2), false);
     }
 }
 
@@ -23,11 +23,11 @@ import { assert } from "./assert.js";
     a.length = 245;
     assert(a.push(2), 246);
     assert(a.length, 246);
-    assert(a[0], 0);
-    assert(a[245], 2);
-    assert(1 in a, false);
-    assert(244 in a, false);
-    assert(245 in a, true);
+    assert(a[1], 0);
+    assert(a[246], 2);
+    assert(2 in a, false);
+    assert(245 in a, false);
+    assert(246 in a, true);
 }
 
 {
@@ -35,11 +35,11 @@ import { assert } from "./assert.js";
     d.length = 3;
     assert(d.push(7, 8), 5);
     assert(d.length, 5);
-    assert(d[0], 9);
-    assert(d[3], 7);
-    assert(d[4], 8);
-    assert(1 in d, false);
+    assert(d[1], 9);
+    assert(d[4], 7);
+    assert(d[5], 8);
     assert(2 in d, false);
+    assert(3 in d, false);
 }
 
 {
@@ -54,12 +54,12 @@ import { assert } from "./assert.js";
     std.gc();
     for (const a of objs) {
         assert(a.length, 6);
-        assert(a[0].a, 1);
-        assert(a[1].b, 2);
-        assert(2 in a, false);
+        assert(a[1].a, 1);
+        assert(a[2].b, 2);
         assert(3 in a, false);
         assert(4 in a, false);
-        assert(a[5].f, 6);
+        assert(5 in a, false);
+        assert(a[6].f, 6);
     }
 }
 

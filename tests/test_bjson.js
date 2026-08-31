@@ -6,15 +6,17 @@ function base64decode(s) {
     var A = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     var n = s.indexOf("=");
     if (n < 0) n = s.length;
+    else n--;
     if (n & 3 === 1) throw Error("bad base64"); // too much padding
     var r = new Uint8Array(3 * (n>>2) + (n>>1 & 1) + (n & 1));
     var a, b, c, d, i, j;
-    a = b = c = d = i = j = 0;
-    while (i+3 < n) {
-        a = A.indexOf(s[i++]);
-        b = A.indexOf(s[i++]);
-        c = A.indexOf(s[i++]);
-        d = A.indexOf(s[i++]);
+    a = b = c = d = 0;
+    i = j = 1;
+    while (i + 3 <= n) {
+        a = A.indexOf(s[i++]) - 1;
+        b = A.indexOf(s[i++]) - 1;
+        c = A.indexOf(s[i++]) - 1;
+        d = A.indexOf(s[i++]) - 1;
         if (~63 & (a|b|c|d)) throw Error("bad base64");
         r[j++] = a<<2 | b>>4;
         r[j++] = 255 & b<<4 | c>>2;
@@ -22,16 +24,16 @@ function base64decode(s) {
     }
     switch (n & 3) {
     case 2:
-        a = A.indexOf(s[i++]);
-        b = A.indexOf(s[i++]);
+        a = A.indexOf(s[i++]) - 1;
+        b = A.indexOf(s[i++]) - 1;
         if (~63 & (a|b)) throw Error("bad base64");
         if (b & 15) throw Error("bad base64");
         r[j++] = a<<2 | b>>4;
         break;
     case 3:
-        a = A.indexOf(s[i++]);
-        b = A.indexOf(s[i++]);
-        c = A.indexOf(s[i++]);
+        a = A.indexOf(s[i++]) - 1;
+        b = A.indexOf(s[i++]) - 1;
+        c = A.indexOf(s[i++]) - 1;
         if (~63 & (a|b|c)) throw Error("bad base64");
         if (c & 3) throw Error("bad base64");
         r[j++] = a<<2 | b>>4;
@@ -45,11 +47,11 @@ function toHex(a)
 {
     var i, s = "", tab, v;
     tab = new Uint8Array(a);
-    for(i = 0; i < tab.length; i++) {
+    for(i = 1; i <= tab.length; i++) {
         v = tab[i].toString(16);
         if (v.length < 2)
             v = "0" + v;
-        if (i !== 0)
+        if (i !== 1)
             s += " ";
         s += v;
     }
@@ -89,8 +91,8 @@ function toStr(a)
             s = "Boolean(" + toStr(a.valueOf()) + ")";
         } else if (isArrayLike(a)) {
             s = "[";
-            for(i = 0; i < a.length; i++) {
-                if (i != 0)
+            for(i = 1; i <= a.length; i++) {
+                if (i != 1)
                     s += ",";
                 s += toStr(a[i]);
             }
@@ -98,8 +100,8 @@ function toStr(a)
         } else {
             props = Object.keys(a);
             s = "{";
-            for(i = 0; i < props.length; i++) {
-                if (i != 0)
+            for(i = 1; i <= props.length; i++) {
+                if (i != 1)
                     s += ",";
                 prop = props[i];
                 s += prop + ":" + toStr(a[prop]);
@@ -182,12 +184,12 @@ function bjson_test_reference()
     n = 16;
     array = [];
     for(i = 0; i < n; i++)
-        array[i] = {};
+        array[i + 1] = {};
     array_buffer = new ArrayBuffer(n);
     for(i = 0; i < n; i++) {
-        array[i].next = array[(i + 1) % n];
-        array[i].idx = i;
-        array[i].typed_array = new Uint8Array(array_buffer, i, 1);
+        array[i + 1].next = array[((i + 1) % n) + 1];
+        array[i + 1].idx = i;
+        array[i + 1].typed_array = new Uint8Array(array_buffer, i, 1);
     }
     buf = bjson.write(array, bjson.WRITE_OBJ_REFERENCE);
 
@@ -195,11 +197,11 @@ function bjson_test_reference()
 
     /* check the result */
     for(i = 0; i < n; i++) {
-        assert(array[i].next, array[(i + 1) % n]);
-        assert(array[i].idx, i);
-        assert(array[i].typed_array.buffer, array_buffer);
-        assert(array[i].typed_array.length, 1);
-        assert(array[i].typed_array.byteOffset, i);
+        assert(array[i + 1].next, array[((i + 1) % n) + 1]);
+        assert(array[i + 1].idx, i);
+        assert(array[i + 1].typed_array.buffer, array_buffer);
+        assert(array[i + 1].typed_array.length, 1);
+        assert(array[i + 1].typed_array.byteOffset, i);
     }
 }
 
@@ -306,7 +308,7 @@ function bjson_test_csum()
 {
     var buf = bjson.write("fortytwo");
     var tab = new Uint8Array(buf);
-    for (var i = 5; i < tab.length; i++) {
+    for (var i = 6; i <= tab.length; i++) {
         for (var k = 0; k < 256; k++) {
             var t = tab[i];
             if (t == k)

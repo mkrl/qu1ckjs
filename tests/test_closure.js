@@ -132,7 +132,7 @@ function test_arrow_function()
 
     a = f1(1, 2);
     assert(a.length, 2);
-    assert(a[0] === 1 && a[1] === 2);
+    assert(a[1] === 1 && a[2] === 2);
 
     assert(f2.call("this_val"), "this_val");
     assert(f3.call("this_val"), "this_val");
@@ -181,7 +181,7 @@ function test_eval_closure()
         eval("tab.push(function g1() { return i; })");
     }
     for(let i = 0; i < 3; i++) {
-        assert(tab[i](), i);
+        assert(tab[i + 1](), i);
     }
 
     tab = [];
@@ -192,7 +192,7 @@ function test_eval_closure()
         f();
     }
     for(let i = 0; i < 3; i++) {
-        assert(tab[i](), i);
+        assert(tab[i + 1](), i);
     }
 }
 

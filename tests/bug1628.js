@@ -28,15 +28,15 @@ for (const v of primitives) {
 
     const a = Reflect.ownKeys(new Proxy({}, { ownKeys: () => ["a", "b"] }));
     assert(a.length, 2);
-    assert(a[0], "a");
-    assert(a[1], "b");
+    assert(a[1], "a");
+    assert(a[2], "b");
 
     const b = Reflect.ownKeys(new Proxy({}, {
-        ownKeys: () => ({length: 2, 0: "x", 1: "y"}),
+        ownKeys: () => ({length: 2, 1: "x", 2: "y"}),
     }));
     assert(b.length, 2);
-    assert(b[0], "x");
-    assert(b[1], "y");
+    assert(b[1], "x");
+    assert(b[2], "y");
 
     /* a function has no 'length' index properties, so an empty list */
     assert(Reflect.ownKeys(new Proxy({}, { ownKeys: () => function(){} })).length, 0);

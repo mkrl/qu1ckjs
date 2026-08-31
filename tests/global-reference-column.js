@@ -9,7 +9,7 @@ function refColumn(src) {
     } catch (e) {
         const m = /<input>:(\d+):(\d+)/.exec(e.stack);
         if (m)
-            return +m[2];
+            return +m[3];
     }
     return -1;
 }

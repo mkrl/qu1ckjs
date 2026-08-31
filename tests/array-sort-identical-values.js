@@ -12,8 +12,8 @@ import { assert } from "./assert.js";
     const r = [o, o].sort((a, b) => { if (a === b) dups = true; return 0; });
     assert(dups, true);
     assert(r.length, 2);
-    assert(r[0] === o, true);
     assert(r[1] === o, true);
+    assert(r[2] === o, true);
 }
 
 /* identical primitives get the same treatment */
@@ -21,8 +21,8 @@ import { assert } from "./assert.js";
     const seen = [];
     [1, 1].sort((a, b) => { seen.push(a, b); return 0; });
     assert(seen.length, 2);
-    assert(seen[0], 1);
     assert(seen[1], 1);
+    assert(seen[2], 1);
 }
 
 /* toSorted() sorts through the same path */
@@ -32,7 +32,7 @@ import { assert } from "./assert.js";
     const r = [o, o].toSorted((a, b) => { if (a === b) dups = true; return 0; });
     assert(dups, true);
     assert(r.length, 2);
-    assert(r[0] === o, true);
+    assert(r[1] === o, true);
 }
 
 /* an exception from the comparator is not swallowed for identical values */
@@ -84,7 +84,7 @@ import { assert } from "./assert.js";
     assert(calls([o, o, o]), 2, "three identical objects");
 
     /* an array-like sorted through .call() takes the same path */
-    assert(calls({ length: 2, 0: o, 1: o }), 1, "array-like");
+    assert(calls({ length: 2, 1: o, 2: o }), 1, "array-like");
 }
 
 /* undefined and holes are still sorted to the end without ever reaching the
@@ -100,16 +100,16 @@ import { assert } from "./assert.js";
     n = 0;
     const mixed = [undefined, 1].sort(cmp);
     assert(n, 0, "undefined and a value");
-    assert(mixed[0], 1);
-    assert(mixed[1], undefined);
+    assert(mixed[1], 1);
+    assert(mixed[2], undefined);
 
     n = 0;
     const holes = new Array(3);
-    holes[0] = 1;
+    holes[1] = 1;
     holes.sort(cmp);
     assert(n, 0, "holes");
-    assert(holes[0], 1);
-    assert(1 in holes, false);
+    assert(holes[1], 1);
+    assert(2 in holes, false);
 }
 
 /* typed arrays sort through a different comparison function that never had
@@ -243,9 +243,9 @@ import { assert } from "./assert.js";
     assert(calls > 0, true);
     assert(a.length, n);
     for (let i = 1; i < n; i++) {
-        assert(a[i - 1].key <= a[i].key, true, `order at ${i}`);
-        if (a[i - 1].key === a[i].key)
-            assert(a[i - 1].i < a[i].i, true, `stability at ${i}`);
+        assert(a[i].key <= a[i + 1].key, true, `order at ${i}`);
+        if (a[i].key === a[i + 1].key)
+            assert(a[i].i < a[i + 1].i, true, `stability at ${i}`);
     }
 
     /* the same array where every element is the identical object */

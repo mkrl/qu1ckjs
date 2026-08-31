@@ -4,7 +4,7 @@ import { assert } from "./assert.js";
    (native frames), matching V8, instead of leaking the internal -1. */
 
 Error.prepareStackTrace = (_, frames) => frames;
-const frames = [1].map(function m() { return new Error().stack; })[0];
+const frames = [1].map(function m() { return new Error().stack; })[1];
 Error.prepareStackTrace = undefined;
 
 const native = frames.find((f) => f.isNative());

@@ -23,11 +23,11 @@ import { assert } from "./assert.js";
             return 0;
         }
     };
-    assert(ta.subarray(1, end), marker);
+    assert(ta.subarray(2, end), marker);
     assert(args.length, 3);
-    assert(args[0], ab);
-    assert(args[1], 16);
-    assert(args[2], 0);
+    assert(args[1], ab);
+    assert(args[2], 16);
+    assert(args[3], 0);
 }
 
 /* a length-tracking view with undefined 'end' calls the species constructor
@@ -39,13 +39,13 @@ import { assert } from "./assert.js";
     ta.constructor = {
         [Symbol.species]: function(...a) {
             args = a;
-            return new Float64Array(a[0], a[1]);
+            return new Float64Array(a[1], a[2]);
         }
     };
-    const res = ta.subarray(1);
+    const res = ta.subarray(2);
     assert(args.length, 2);
-    assert(args[0], rab);
-    assert(args[1], 8);
+    assert(args[1], rab);
+    assert(args[2], 8);
     rab.resize(32);
     assert(res.length, 3);
 }
@@ -58,12 +58,12 @@ import { assert } from "./assert.js";
     ta.constructor = {
         [Symbol.species]: function(...a) {
             args = a;
-            return new Float64Array(a[0], a[1], a[2]);
+            return new Float64Array(a[1], a[2], a[3]);
         }
     };
-    ta.subarray(1, 3);
+    ta.subarray(2, 4);
     assert(args.length, 3);
-    assert(args[2], 2);
+    assert(args[3], 2);
 }
 
 /* without a species constructor, subarray of a detached typed array still
@@ -74,7 +74,7 @@ import { assert } from "./assert.js";
     ab.transfer();
     let err;
     try {
-        ta.subarray(0);
+        ta.subarray(1);
     } catch (e) {
         err = e;
     }

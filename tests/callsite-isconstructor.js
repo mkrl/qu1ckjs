@@ -14,17 +14,17 @@ plain();
 
 Error.prepareStackTrace = undefined;
 
-// after plain(): frame 0 is plain (not a constructor)
-assert(frames[0].getFunctionName(), "plain");
-assert(!frames[0].isConstructor());
+// after plain(): frame 1 is plain (not a constructor)
+assert(frames[1].getFunctionName(), "plain");
+assert(!frames[1].isConstructor());
 
 // re-run for the constructor case
 Error.prepareStackTrace = (_, f) => { frames = f; return f; };
 new Thing();
 Error.prepareStackTrace = undefined;
 
-// frame 0 is Thing, invoked via `new`
-assert(frames[0].getFunctionName(), "Thing");
-assert(frames[0].isConstructor());
+// frame 1 is Thing, invoked via `new`
+assert(frames[1].getFunctionName(), "Thing");
+assert(frames[1].isConstructor());
 // its caller (module top level) is not a constructor
-assert(!frames[1].isConstructor());
+assert(!frames[2].isConstructor());

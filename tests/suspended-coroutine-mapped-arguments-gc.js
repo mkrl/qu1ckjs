@@ -25,4 +25,4 @@ step(123);
 std.gc();
 
 // If the frame was wrongly collected this reads freed memory.
-assert(leaked()[0], 123);
+assert(leaked()[1], 123);

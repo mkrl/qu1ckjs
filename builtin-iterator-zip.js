@@ -15,8 +15,8 @@
     function closeall(iters, count) {
         let ex = undefined
         for (let i = count; i-- > 0;) {
-            let iter = iters[i]
-            iters[i] = undefined
+            let iter = iters[i + 1]
+            iters[i + 1] = undefined
             let e = close(iter)
             if (!ex) ex = e
         }
@@ -59,8 +59,8 @@
                 check(iter, "bad iterator")
                 let method = iter[Symbol·iterator]
                 if (method) iter = call(iter, method) // iterable -> iterator
-                iters[count] = iter
-                nexts[count] = iter.next
+                iters[count + 1] = iter
+                nexts[count + 1] = iter.next
                 count++
             }
             iterablesiter = undefined
@@ -84,7 +84,7 @@
                         throw e
                     }
                     if (done) break
-                    pads[i] = value
+                    pads[i + 1] = value
                 }
                 // have to be careful to not double-close on exception
                 // exceptions from .return() should still bubble up though
@@ -94,7 +94,7 @@
                     let ex = close(t)
                     if (ex) throw ex
                 }
-                for (; i < count; i++) pads[i] = undefined
+                for (; i < count; i++) pads[i + 1] = undefined
             }
         } catch (e) {
             closeall(iters, count)
@@ -127,18 +127,19 @@
                 let values = 0
                 let results = []
                 for (let i = 0; i < count; i++) {
-                    let iter = iters[i]
+                    let position = i + 1
+                    let iter = iters[position]
                     if (!iter) {
                         if (mode !== "longest") throw new InternalError("bug")
-                        results[i] = pads[i]
+                        results[position] = pads[position]
                         continue
                     }
                     let result
                     try {
-                        result = call(iter, nexts[i])
+                        result = call(iter, nexts[position])
                     } catch (e) {
                         alive = 0
-                        iters[i] = undefined
+                        iters[position] = undefined
                         closeall(iters, count)
                         throw e
                     }
@@ -149,13 +150,13 @@
                             closeall(iters, count)
                             throw new TypeError("mismatched inputs")
                         }
-                        results[i] = result.value
+                        results[position] = result.value
                         values++
                         continue
                     }
                     alive--
                     dones++
-                    iters[i] = undefined
+                    iters[position] = undefined
                     switch (mode) {
                     case "shortest":
                         let ex = closeall(iters, count)
@@ -167,7 +168,7 @@
                             state = 3 // complete
                             return {value:undefined, done:true}
                         }
-                        results[i] = pads[i]
+                        results[position] = pads[position]
                         break
                     case "strict":
                         if (values > 0) {

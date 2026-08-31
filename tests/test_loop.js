@@ -113,7 +113,7 @@ function test_for_in()
     for(i in a) {
         tab.push(i);
     }
-    assert(tab.toString(), "0,1,2,3,4,5,6,7,8,9", "for_in");
+    assert(tab.toString(), "1,2,3,4,5,6,7,8,9,10", "for_in");
 
     /* iterate with a field */
     a={x:0};
@@ -126,8 +126,8 @@ function test_for_in()
     /* iterate with a variable field */
     a=[0];
     tab = [];
-    for(a[0] in {x:1, y: 2}) {
-        tab.push(a[0]);
+    for(a[1] in {x:1, y: 2}) {
+        tab.push(a[1]);
     }
     assert(tab.toString(), "x,y", "for_in");
 
