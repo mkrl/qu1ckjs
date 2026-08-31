@@ -50,26 +50,24 @@ jobs:
         config:
           # see https://github.com/quickjs-ng/quickjs/issues/879 - tl;dr flaky
           #- { os: ubuntu-24.04-arm, configType: Debug }
-          #- { os: ubuntu-24.04-arm, configType: Release, runTest262: true }
+          #- { os: ubuntu-24.04-arm, configType: Release }
           - { os: ubuntu-latest, configType: Debug }
-          - { os: ubuntu-latest, configType: Release, runTest262: true }
+          - { os: ubuntu-latest, configType: Release }
           - { os: ubuntu-latest, configType: examples }
           - { os: ubuntu-latest, configType: shared }
-          - { os: ubuntu-latest, configType: asan+ubsan, runTest262: true }
+          - { os: ubuntu-latest, configType: asan+ubsan }
           - { os: ubuntu-latest, configType: msan }
           - { os: ubuntu-latest, configType: tcc }
-          - { os: ubuntu-latest, arch: x86, runTest262: true }
+          - { os: ubuntu-latest, arch: x86 }
           - { os: ubuntu-latest, arch: riscv64 }
 
           - { os: macos-14, configType: Debug }
           - { os: macos-14, configType: Release }
           - { os: macos-14, configType: examples }
           - { os: macos-14, configType: shared }
-          - { os: macos-14, configType: asan+ubsan, runTest262: true }
+          - { os: macos-14, configType: asan+ubsan }
     steps:
       - uses: actions/checkout@v7
-        with:
-          submodules: true
 
       - name: install TCC
         if: ${{ matrix.config.configType == 'tcc' }}
@@ -154,12 +152,6 @@ jobs:
           ./build/qjs tests/test_bjson.js
           ./build/function_source
 
-      - name: test 262
-        if: ${{ matrix.config.runTest262 }}
-        run: |
-          git submodule update --init --checkout --depth 1
-          make test262
-
       - name: test standalone
         run: |
           ./build/qjs -c examples/hello.js -o hello
@@ -235,7 +227,6 @@ jobs:
           ninja.exe --version
       - name: build
         run: |
-          git submodule update --init --checkout --depth 1
           cmake -B build -DQJS_BUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_C_COMPILER=clang.exe -G "Ninja"
           cmake --build build --config ${{matrix.buildType}}
       - name: stats
@@ -264,7 +255,6 @@ jobs:
       - uses: actions/checkout@v7
       - name: build
         run: |
-          git submodule update --init --checkout --depth 1
           cmake -B build -DQJS_BUILD_WERROR=ON -DQJS_BUILD_EXAMPLES=ON -G "Visual Studio 18" -T ClangCL
           cmake --build build --config ${{matrix.buildType}}
       - name: stats
@@ -303,7 +293,6 @@ jobs:
           ninja.exe --version
       - name: build
         run: |
-          git submodule update --init --checkout --depth 1
           cmake -B build -DQJS_BUILD_WERROR=ON -DQJS_BUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -G "Ninja"
           cmake --build build
       - name: stats
