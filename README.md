@@ -12,6 +12,33 @@ This project is a _fork_ of the [original QuickJS project] by Fabrice Bellard an
 Head over to the [project website] for instructions on how to get started and more
 documentation.
 
+## WebAssembly REPL
+
+Make sure the [Emscripten SDK] is installed.
+Activate if needed and installed via emsdk (assuming it's installed in the parent directory).
+
+```sh
+source ../emsdk/emsdk_env.sh
+```
+
+Configure and build the browser target with CMake:
+
+```sh
+emcmake cmake -S . -B build-wasm -DCMAKE_BUILD_TYPE=Release
+cmake --build build-wasm --target qjs_browser -j
+```
+
+Start a local web server from the repository root:
+
+```sh
+/usr/bin/python3 -m http.server 8000 -d build-wasm/web
+```
+
+Then open <http://localhost:8000>. The page keeps a QuickJS runtime alive in a
+Web Worker, so declarations remain available between evaluations.
+
+This uses xterm.js as a terminal emulator.
+
 ## Authors
 
 [@bnoordhuis], [@saghul], and many more [contributors].
@@ -22,3 +49,4 @@ documentation.
 [@saghul]: https://github.com/saghul
 [contributors]: https://github.com/quickjs-ng/quickjs/graphs/contributors
 [project website]: https://quickjs-ng.github.io/quickjs/
+[Emscripten SDK]: https://emscripten.org/docs/getting_started/downloads.html

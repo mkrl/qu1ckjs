@@ -345,21 +345,37 @@ if(NOT QJS_BUILD_LIBC)
 endif()
 
 if(EMSCRIPTEN)
-    add_executable(qjs_wasm ${qjs_sources})
-    target_link_options(qjs_wasm PRIVATE
-        # in emscripten 3.x, this will be set to 16k which is too small for quickjs. #write sth. to force github rebuild
-        -sSTACK_SIZE=2097152 # let it be 2m = 2 * 1024 * 1024 = 2097152, otherwise, stack overflow may be occured at bootstrap
+    add_executable(qjs_browser qjs-browser.c)
+    add_qjs_libc_if_needed(qjs_browser)
+    set_target_properties(qjs_browser PROPERTIES
+        OUTPUT_NAME "qjs"
+        SUFFIX ".js"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/web"
+    )
+    target_compile_definitions(qjs_browser PRIVATE ${qjs_defines})
+    target_link_libraries(qjs_browser PRIVATE qjs)
+    target_link_options(qjs_browser PRIVATE
+        --no-entry
+        -sSTACK_SIZE=2097152
+        -sINITIAL_MEMORY=33554432
+        -sALLOW_MEMORY_GROWTH=1
         -sNO_INVOKE_RUN
         -sNO_EXIT_RUNTIME
-        -sMODULARIZE # do not mess the global
-        -sEXPORT_ES6 # export js file to morden es module
-        -sEXPORT_NAME=getQuickJs # give a name
-        -sTEXTDECODER=1 # it will be 2 if we use -Oz, and that will cause js -> c string convertion fail
-        -sNO_DEFAULT_TO_CXX # this project is pure c project, no need for c plus plus handle
-        -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
+        -sMODULARIZE=1
+        -sEXPORT_ES6=1
+        -sEXPORT_NAME=createQuickJS
+        -sENVIRONMENT=worker
+        "-sEXPORTED_FUNCTIONS=['_qjs_browser_init','_qjs_browser_eval','_qjs_browser_last_eval_failed','_qjs_browser_destroy']"
+        "-sEXPORTED_RUNTIME_METHODS=['ccall']"
     )
-    target_compile_definitions(qjs_wasm PRIVATE ${qjs_defines})
-    target_link_libraries(qjs_wasm PRIVATE m)
+
+    foreach(browser_asset index.html app.js repl-worker.js styles.css)
+        configure_file(
+            "${CMAKE_CURRENT_SOURCE_DIR}/web/${browser_asset}"
+            "${CMAKE_BINARY_DIR}/web/${browser_asset}"
+            COPYONLY
+        )
+    endforeach()
 endif()
 
 

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f0e8">
+  <title>QuickJS Web REPL</title>
+  <link rel="stylesheet" href="https://unpkg.com/@xterm/xterm@6.0.0/css/xterm.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">When 0 doesn't quite cut it</p>
+        <h1>Qu1ckJS <span>Web REPL</span></h1>
+      </div>
+      <div class="runtime-state" data-state="loading">
+        <i aria-hidden="true"></i>
+        <span id="runtime-label">Loading engine</span>
+      </div>
+    </header>
+
+    <section class="terminal-frame" aria-label="JavaScript REPL">
+      <div id="terminal"></div>
+    </section>
+
+    <footer class="actions">
+      <button id="clear" type="button">Clear output</button>
+      <button id="reset" type="button" disabled>Reset runtime</button>
+    </footer>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
