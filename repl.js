@@ -169,7 +169,7 @@ import * as bjson from "qjs:bjson";
             if (os.ttyGetWinSize) {
                 tab = os.ttyGetWinSize(term_fd);
                 if (tab)
-                    term_width = tab[0];
+                    term_width = tab[1];
             }
             if (os.ttySetRaw) {
                 /* set the TTY to raw mode */
@@ -193,7 +193,7 @@ import * as bjson from "qjs:bjson";
     function term_read_handler() {
         var l, i;
         l = os.read(term_fd, term_read_buf.buffer, 0, term_read_buf.length);
-        for(i = 0; i < l; i++)
+        for(i = 1; i <= l; i++)
             handle_byte(term_read_buf[i]);
     }
 
@@ -230,7 +230,27 @@ import * as bjson from "qjs:bjson";
     }
 
     function is_blank(c) {
-        return typeof c === "string" && "\t\r\n\f\v".includes(c[0])
+        return typeof c === "string" && "\t\r\n\f\v".includes(c[1])
+    }
+
+    function char_at(str, offset) {
+        return str.charAt(offset + 1);
+    }
+
+    function substring(str, start, end) {
+        if (end === undefined)
+            return str.substring(start + 1);
+        return str.substring(start + 1, end + 1);
+    }
+
+    function slice(str, start, end) {
+        if (start >= 0)
+            start++;
+        if (end !== undefined && end >= 0)
+            end++;
+        if (end === undefined)
+            return str.slice(start);
+        return str.slice(start, end);
     }
 
     function ucs_length(str) {
@@ -238,10 +258,10 @@ import * as bjson from "qjs:bjson";
         len = 0;
         /* we never count the trailing surrogate to have the
          following property: ucs_length(str) =
-         ucs_length(str.substring(0, a)) + ucs_length(str.substring(a,
+            ucs_length(substring(str, 0, a)) + ucs_length(substring(str, a,
          str.length)) for 0 <= a <= str.length */
         for(i = 0; i < str_len; i++) {
-            c = str.charCodeAt(i);
+                c = str.charCodeAt(i + 1);
             if (c < 0xdc00 || c >= 0xe000)
                 len++;
         }
@@ -252,7 +272,7 @@ import * as bjson from "qjs:bjson";
         var d;
         if (typeof c !== "string")
             return false;
-        d = c.codePointAt(0); /* can be NaN if empty string */
+        d = c.codePointAt(1); /* can be NaN if empty string */
         return d >= 0xdc00 && d < 0xe000;
     }
 
@@ -269,11 +289,11 @@ import * as bjson from "qjs:bjson";
     function print_color_text(str, start, style_names) {
         var i, j;
         for (j = start; j < str.length;) {
-            var style = style_names[i = j];
-            while (++j < str.length && style_names[j] == style)
+            var style = style_names[(i = j) + 1];
+            while (++j < str.length && style_names[j + 1] == style)
                 continue;
             std.puts(colors[styles[style] || 'none']);
-            std.puts(str.substring(i, j));
+            std.puts(substring(str, i, j));
             std.puts(colors['none']);
         }
     }
@@ -321,17 +341,17 @@ import * as bjson from "qjs:bjson";
         /* cursor_pos is the position in 16 bit characters inside the
            UTF-16 string 'cmd' */
         if (cmd != last_cmd) {
-            if (!show_colors && last_cmd.substring(0, last_cursor_pos) == cmd.substring(0, last_cursor_pos)) {
+            if (!show_colors && substring(last_cmd, 0, last_cursor_pos) == substring(cmd, 0, last_cursor_pos)) {
                 /* optimize common case */
-                std.puts(cmd.substring(last_cursor_pos));
+                std.puts(substring(cmd, last_cursor_pos));
             } else {
                 /* goto the start of the line */
-                move_cursor(-ucs_length(last_cmd.substring(0, last_cursor_pos)));
+                move_cursor(-ucs_length(substring(last_cmd, 0, last_cursor_pos)));
                 if (show_colors) {
                     var str = mexpr ? mexpr + '\n' + cmd : cmd;
                     var start = str.length - cmd.length;
                     var colorstate = colorize_js(str);
-                    print_color_text(str, start, colorstate[2]);
+                    print_color_text(str, start, colorstate[3]);
                 } else {
                     std.puts(cmd);
                 }
@@ -347,9 +367,9 @@ import * as bjson from "qjs:bjson";
             last_cursor_pos = cmd.length;
         }
         if (cursor_pos > last_cursor_pos) {
-            move_cursor(ucs_length(cmd.substring(last_cursor_pos, cursor_pos)));
+            move_cursor(ucs_length(substring(cmd, last_cursor_pos, cursor_pos)));
         } else if (cursor_pos < last_cursor_pos) {
-            move_cursor(-ucs_length(cmd.substring(cursor_pos, last_cursor_pos)));
+            move_cursor(-ucs_length(substring(cmd, cursor_pos, last_cursor_pos)));
         }
         last_cursor_pos = cursor_pos;
         std.out.flush();
@@ -358,7 +378,7 @@ import * as bjson from "qjs:bjson";
     /* editing commands */
     function insert(str) {
         if (str) {
-            cmd = cmd.substring(0, cursor_pos) + str + cmd.substring(cursor_pos);
+            cmd = substring(cmd, 0, cursor_pos) + str + substring(cmd, cursor_pos);
             cursor_pos += str.length;
         }
     }
@@ -387,7 +407,7 @@ import * as bjson from "qjs:bjson";
     function forward_char() {
         if (cursor_pos < cmd.length) {
             cursor_pos++;
-            while (is_trailing_surrogate(cmd.charAt(cursor_pos)))
+            while (is_trailing_surrogate(char_at(cmd, cursor_pos)))
                 cursor_pos++;
         }
     }
@@ -395,23 +415,23 @@ import * as bjson from "qjs:bjson";
     function backward_char() {
         if (cursor_pos > 0) {
             cursor_pos--;
-            while (is_trailing_surrogate(cmd.charAt(cursor_pos)))
+            while (is_trailing_surrogate(char_at(cmd, cursor_pos)))
                 cursor_pos--;
         }
     }
 
     function skip_word_forward(pos) {
-        while (pos < cmd.length && !is_word(cmd.charAt(pos)))
+        while (pos < cmd.length && !is_word(char_at(cmd, pos)))
             pos++;
-        while (pos < cmd.length && is_word(cmd.charAt(pos)))
+        while (pos < cmd.length && is_word(char_at(cmd, pos)))
             pos++;
         return pos;
     }
 
     function skip_word_backward(pos) {
-        while (pos > 0 && !is_word(cmd.charAt(pos - 1)))
+        while (pos > 0 && !is_word(char_at(cmd, pos - 1)))
             pos--;
-        while (pos > 0 && is_word(cmd.charAt(pos - 1)))
+        while (pos > 0 && is_word(char_at(cmd, pos - 1)))
             pos--;
         return pos;
     }
@@ -438,7 +458,7 @@ import * as bjson from "qjs:bjson";
     function history_add(str) {
         str = str.trimRight();
         if (str) {
-            while (history.length && !history[history.length - 1])
+            while (history.length && !history[history.length])
                 history.length--;
             history.push(str);
         }
@@ -451,7 +471,7 @@ import * as bjson from "qjs:bjson";
                 history.push(cmd);
             }
             history_index--;
-            cmd = history[history_index];
+            cmd = history[history_index + 1];
             cursor_pos = cmd.length;
         }
     }
@@ -459,7 +479,7 @@ import * as bjson from "qjs:bjson";
     function next_history() {
         if (history_index < history.length - 1) {
             history_index++;
-            cmd = history[history_index];
+            cmd = history[history_index + 1];
             cursor_pos = cmd.length;
         }
     }
@@ -468,9 +488,9 @@ import * as bjson from "qjs:bjson";
         var pos = cursor_pos;
         for (var i = 1; i <= history.length; i++) {
             var index = (history.length + i * dir + history_index) % history.length;
-            if (history[index].substring(0, pos) == cmd.substring(0, pos)) {
+            if (substring(history[index + 1], 0, pos) == substring(cmd, 0, pos)) {
                 history_index = index;
-                cmd = history[index];
+                cmd = history[index + 1];
                 return;
             }
         }
@@ -490,18 +510,18 @@ import * as bjson from "qjs:bjson";
         start = cursor_pos;
         if (dir < 0) {
             start--;
-            while (is_trailing_surrogate(cmd.charAt(start)))
+            while (is_trailing_surrogate(char_at(cmd, start)))
                 start--;
         }
         end = start + 1;
-        while (is_trailing_surrogate(cmd.charAt(end)))
+        while (is_trailing_surrogate(char_at(cmd, end)))
             end++;
 
         if (start >= 0 && start < cmd.length) {
             if (last_fun === kill_region) {
                 kill_region(start, end, dir);
             } else {
-                cmd = cmd.substring(0, start) + cmd.substring(end);
+                cmd = substring(cmd, 0, start) + substring(cmd, end);
                 cursor_pos = start;
             }
         }
@@ -529,8 +549,8 @@ import * as bjson from "qjs:bjson";
         if (cmd.length > 1 && pos > 0) {
             if (pos == cmd.length)
                 pos--;
-            cmd = cmd.substring(0, pos - 1) + cmd.substring(pos, pos + 1) +
-                cmd.substring(pos - 1, pos) + cmd.substring(pos + 1);
+            cmd = substring(cmd, 0, pos - 1) + substring(cmd, pos, pos + 1) +
+                substring(cmd, pos - 1, pos) + substring(cmd, pos + 1);
             cursor_pos = pos + 1;
         }
     }
@@ -542,28 +562,28 @@ import * as bjson from "qjs:bjson";
         var p3 = skip_word_backward(p4);
 
         if (p1 < p2 && p2 <= cursor_pos && cursor_pos <= p3 && p3 < p4) {
-            cmd = cmd.substring(0, p1) + cmd.substring(p3, p4) +
-            cmd.substring(p2, p3) + cmd.substring(p1, p2);
+            cmd = substring(cmd, 0, p1) + substring(cmd, p3, p4) +
+            substring(cmd, p2, p3) + substring(cmd, p1, p2);
             cursor_pos = p4;
         }
     }
 
     function upcase_word() {
         var end = skip_word_forward(cursor_pos);
-        cmd = cmd.substring(0, cursor_pos) +
-            cmd.substring(cursor_pos, end).toUpperCase() +
-            cmd.substring(end);
+        cmd = substring(cmd, 0, cursor_pos) +
+            substring(cmd, cursor_pos, end).toUpperCase() +
+            substring(cmd, end);
     }
 
     function downcase_word() {
         var end = skip_word_forward(cursor_pos);
-        cmd = cmd.substring(0, cursor_pos) +
-            cmd.substring(cursor_pos, end).toLowerCase() +
-            cmd.substring(end);
+        cmd = substring(cmd, 0, cursor_pos) +
+            substring(cmd, cursor_pos, end).toLowerCase() +
+            substring(cmd, end);
     }
 
     function kill_region(start, end, dir) {
-        var s = cmd.substring(start, end);
+        var s = substring(cmd, start, end);
         if (last_fun !== kill_region)
             clip_board = s;
         else if (dir < 0)
@@ -571,7 +591,7 @@ import * as bjson from "qjs:bjson";
         else
             clip_board = clip_board + s;
 
-        cmd = cmd.substring(0, start) + cmd.substring(end);
+        cmd = substring(cmd, 0, start) + substring(cmd, end);
         if (cursor_pos > end)
             cursor_pos -= end - start;
         else if (cursor_pos > start)
@@ -617,31 +637,31 @@ import * as bjson from "qjs:bjson";
     // returns true if |line| looks something like "object.prop"
     function is_named_property(line, end) {
         var pos = end;
-        while (pos > 0 && is_word(line[pos - 1]))
+        while (pos > 0 && is_word(char_at(line, pos - 1)))
             pos--;
-        while (pos > 0 && is_blank(line[pos - 1]))
+        while (pos > 0 && is_blank(char_at(line, pos - 1)))
             pos--;
-        return pos > 0 && line[pos - 1] === ".";
+        return pos > 0 && char_at(line, pos - 1) === ".";
     }
 
     function get_context_word(line, end) {
         var pos = end;
-        while (pos > 0 && is_word(line[pos - 1]))
+        while (pos > 0 && is_word(char_at(line, pos - 1)))
             pos--;
-        return line.slice(pos, end);
+        return slice(line, pos, end);
     }
 
     function get_context_object(line, pos) {
         if (pos <= 0)
             return g;
-        var c = line[pos - 1];
+        var c = char_at(line, pos - 1);
         if (pos === 1 && (c === '\\' || c === '.'))
             return directives;
         if ("'\"`@#)]}\\".indexOf(c) >= 0)
             return void 0;
         if (c === ".") {
             pos--;
-            switch (c = line[pos - 1]) {
+            switch (c = char_at(line, pos - 1)) {
             case '\'':
             case '\"':
             case '`':
@@ -670,7 +690,7 @@ import * as bjson from "qjs:bjson";
                     // Check if `base` is a set of regexp flags
                     // TODO(chqrlie): this is incorrect for a/i<TAB>...
                     // Should use colorizer to determine the token type
-                    if (base_pos >= 3 && line[base_pos - 1] === '/' && base.match(/^[dgimsuvy]+$/))
+                    if (base_pos >= 3 && char_at(line, base_pos - 1) === '/' && base.match(/^[dgimsuvy]+$/))
                         return RegExp();
                     // base is a local identifier, complete as generic object
                 }
@@ -700,7 +720,7 @@ import * as bjson from "qjs:bjson";
             var props = Object.getOwnPropertyNames(obj);
             /* add non-numeric regular properties */
             for (j = 0; j < props.length; j++) {
-                var prop = props[j];
+                var prop = props[j + 1];
                 if (typeof prop == "string" && ""+(+prop) != prop && prop.startsWith(s))
                     r.push(prop);
             }
@@ -709,10 +729,10 @@ import * as bjson from "qjs:bjson";
         if (r.length > 1) {
             /* sort list with internal names last and remove duplicates */
             function symcmp(a, b) {
-                if (a[0] != b[0]) {
-                    if (a[0] == '_')
+                if (a[1] != b[1]) {
+                    if (a[1] == '_')
                         return 1;
-                    if (b[0] == '_')
+                    if (b[1] == '_')
                         return -1;
                 }
                 if (a < b)
@@ -723,8 +743,8 @@ import * as bjson from "qjs:bjson";
             }
             r.sort(symcmp);
             for(i = j = 1; i < r.length; i++) {
-                if (r[i] != r[i - 1])
-                    r[j++] = r[i];
+                if (r[i + 1] != r[i])
+                    r[++j] = r[i + 1];
             }
             r.length = j;
         }
@@ -739,24 +759,24 @@ import * as bjson from "qjs:bjson";
         tab = res.tab;
         if (tab.length === 0)
             return;
-        s = tab[0];
+        s = tab[1];
         len = s.length;
         /* add the chars which are identical in all the completions */
         for(i = 1; i < tab.length; i++) {
-            t = tab[i];
+            t = tab[i + 1];
             for(j = 0; j < len; j++) {
-                if (t[j] !== s[j]) {
+                if (char_at(t, j) !== char_at(s, j)) {
                     len = j;
                     break;
                 }
             }
         }
         for(i = res.pos; i < len; i++) {
-            insert(s[i]);
+            insert(char_at(s, i));
         }
         if (last_fun === completion && tab.length == 1) {
             /* append parentheses to function names */
-            s = tab[0];
+            s = tab[1];
             var m = res.ctx[s];
             if (typeof m == "function") {
                 insert('(');
@@ -771,7 +791,7 @@ import * as bjson from "qjs:bjson";
         if (last_fun === completion && tab.length >= 2) {
             max_width = 0;
             for(i = 0; i < tab.length; i++)
-                max_width = Math.max(max_width, tab[i].length);
+                max_width = Math.max(max_width, tab[i + 1].length);
             max_width += 2;
             n_cols = Math.max(1, Math.floor((term_width + 1) / max_width));
             n_rows = Math.ceil(tab.length / n_cols);
@@ -782,7 +802,7 @@ import * as bjson from "qjs:bjson";
                     i = col * n_rows + row;
                     if (i >= tab.length)
                         break;
-                    s = tab[i];
+                    s = tab[i + 1];
                     if (col != n_cols - 1)
                         s = s.padEnd(max_width);
                     std.puts(s);
@@ -1040,19 +1060,25 @@ import * as bjson from "qjs:bjson";
         function quote_str(s) {
             if (s.includes("'"))
                 return JSON.stringify(s);
-            s = JSON.stringify(s).slice(1, -1).replaceAll('\\"', '"');
+            s = slice(JSON.stringify(s), 1, -1).replaceAll('\\"', '"');
             return `'${s}'`;
+        }
+        function token(index) {
+            return tokens[index + 1];
+        }
+        function set_token(index, value) {
+            tokens[index + 1] = value;
         }
         function push_token(s) {
             tokens.push("" + s);
         }
         function append_token(s) {
-            tokens[tokens.length - 1] += s;
+            tokens[tokens.length] += s;
         }
         function class_tag(o) {
             // get the class id of an object
             // works for boxed objects, Math, JSON, globalThis...
-            return Object.prototype.toString.call(o).slice(8, -1);
+            return slice(Object.prototype.toString.call(o), 8, -1);
         }
 
         function print_rec(a, level) {
@@ -1071,7 +1097,7 @@ import * as bjson from "qjs:bjson";
                 break;
             case "string":
                 if (a.length > maxStringLength)
-                    a = a.substring(0, maxStringLength) + "...";
+                    a = substring(a, 0, maxStringLength) + "...";
                 push_token(quote_str(a));
                 break;
             case "symbol":
@@ -1144,11 +1170,11 @@ import * as bjson from "qjs:bjson";
                     }
                     for (i = 0; i < len; i++) {
                         k++;
-                        if (i in a) {
-                            print_rec(a[i], level + 1);
+                        if (i + 1 in a) {
+                            print_rec(a[i + 1], level + 1);
                         } else {
                             var start = i;
-                            while (i + 1 < len && !((i + 1) in a))
+                            while (i + 1 < len && !((i + 2) in a))
                                 i++;
                             if (i > start)
                                 push_token(`<${i - start + 1} empty items>`);
@@ -1172,8 +1198,8 @@ import * as bjson from "qjs:bjson";
                 if (noindex) {
                     /* skip all index properties */
                     for (; n0 < n; n0++) {
-                        i = +keys[n0];
-                        if (i !== (i >>> 0) || i >= len)
+                        i = +keys[n0 + 1];
+                        if (i !== (i >>> 0) || i < 1 || i > len)
                             break;
                     }
                 }
@@ -1188,7 +1214,7 @@ import * as bjson from "qjs:bjson";
                         return;
                     }
                     for(i = n0; i < n; i++) {
-                        var key = keys[i];
+                        var key = keys[i + 1];
                         var desc = Object.getOwnPropertyDescriptor(a, key);
                         if (!desc)
                             continue;
@@ -1221,7 +1247,7 @@ import * as bjson from "qjs:bjson";
                     push_token(brace);
                 stack.pop(a);
                 if ((i = refs.indexOf(a)) > 0)
-                    tokens[obj_index] = `<ref *${i}> ${tokens[obj_index]}`;
+                    set_token(obj_index, `<ref *${i}> ${token(obj_index)}`);
                 break;
             default:
                 push_token(String(a));
@@ -1243,7 +1269,7 @@ import * as bjson from "qjs:bjson";
             output.push(s);
         }
         function output_propname(s) {
-            if (s[0] >= '0' && s[0] <= '9')
+            if (s[1] >= '0' && s[1] <= '9')
                 output_str(s, 'number');
             else
                 output_str(s, 'propname');
@@ -1259,7 +1285,7 @@ import * as bjson from "qjs:bjson";
                 var chunk = s;
                 var len = 0;
                 var m = null;
-                switch (s[0]) {
+                switch (s[1]) {
                 case '"':
                     style = 'string';
                     m = s.match(/^"([^\\"]|\\.)*"/);
@@ -1319,29 +1345,29 @@ import * as bjson from "qjs:bjson";
                     break;
                 }
                 if (m)
-                    len = m[0].length;
+                    len = m[1].length;
                 if (len > 0)
-                    chunk = s.slice(0, len);
+                    chunk = slice(s, 0, len);
                 output_str(chunk, style);
-                s = s.slice(chunk.length);
+                s = slice(s, chunk.length);
             }
         }
         function is_block(s) {
-            var c = s[s.length - 1];
+            var c = s[s.length];
             return c === '[' || c === '{';
         }
         function block_width(i) {
-            var w = tokens[i].length;
-            if (tokens[i + 1] === ":") {
+            var w = token(i).length;
+            if (token(i + 1) === ":") {
                 i += 2;
-                w += 2 + tokens[i].length;
+                w += 2 + token(i).length;
             }
             var width = w;
-            if (is_block(tokens[i])) {
+            if (is_block(token(i))) {
                 var seplen = 1;
                 while (++i < tokens.length) {
                     width += seplen;
-                    var s = tokens[i];
+                    var s = token(i);
                     if (s === ']' || s === '}')
                         break;
                     [ i, w ] = block_width(i);
@@ -1354,16 +1380,16 @@ import * as bjson from "qjs:bjson";
         function output_single(i, last) {
             var sep = "";
             while (i <= last) {
-                var s = tokens[i++];
+                var s = token(i++);
                 if (s === ']' || s === '}') {
                     if (sep.length > 1)
                         output_str(" ");
                 } else {
                     output_str(sep);
-                    if (tokens[i] === ":") {
+                    if (token(i) === ":") {
                         output_propname(s);
                         i++;
-                        s = tokens[i++];
+                        s = token(i++);
                     }
                 }
                 output_pretty(s);
@@ -1382,12 +1408,12 @@ import * as bjson from "qjs:bjson";
                 output_single(from, last);
                 return [ last, width ];
             }
-            if (tokens[from + 1] === ":") {
-                output_propname(tokens[from]);
+            if (token(from + 1) === ":") {
+                output_propname(token(from));
                 from += 2;
             }
-            output_pretty(tokens[from]);
-            if (!is_block(tokens[from])) {
+            output_pretty(token(from));
+            if (!is_block(token(from))) {
                 return [ from, width ];
             }
             indent += 2;
@@ -1395,27 +1421,28 @@ import * as bjson from "qjs:bjson";
             var sep = "";
             var first = from + 1;
             var i, w;
-            if (tokens[from].endsWith('[')) {
+            if (token(from).endsWith('[')) {
                 /* array: try multiple columns for indexed values */
                 var k = 0, col, cols;
                 var tab = [];
                 for (i = first; i < last; i++) {
-                    if (tokens[i][0] === '.' || tokens[i + 1] === ':')
+                    if (token(i)[1] === '.' || token(i + 1) === ':')
                         break;
                     [ i, w ] = block_width(i);
-                    tab[k++] = w;
+                    tab[k + 1] = w;
+                    k++;
                 }
                 var colwidth;
                 for (cols = Math.min(avail_width / 3, tab.length, 16); cols > 1; cols--) {
                     colwidth = [];
                     col = 0;
                     for (k = 0; k < tab.length; k++) {
-                        colwidth[col] = Math.max(colwidth[col] || 0, tab[k] + 2);
+                        colwidth[col + 1] = Math.max(colwidth[col + 1] || 0, tab[k + 1] + 2);
                         col = (col + 1) % cols;
                     }
                     w = 0;
                     for (col = 0; col < cols; col++) {
-                        w += colwidth[col];
+                        w += colwidth[col + 1];
                     }
                     if (w <= avail_width)
                         break;
@@ -1424,7 +1451,7 @@ import * as bjson from "qjs:bjson";
                     w = 0;
                     col = cols - 1;
                     for (i = first; i < last; i++) {
-                        if (tokens[i][0] === '.' || tokens[i + 1] === ':')
+                        if (token(i)[1] === '.' || token(i + 1) === ':')
                             break;
                         w += sep.length;
                         output_str(sep);
@@ -1433,7 +1460,7 @@ import * as bjson from "qjs:bjson";
                             output_spaces("\n", indent);
                             col = 0;
                         } else {
-                            output_spaces("", colwidth[col++] - w);
+                            output_spaces("", colwidth[++col] - w);
                         }
                         [i, w] = output_indent(indent, i);
                     }
@@ -1447,7 +1474,7 @@ import * as bjson from "qjs:bjson";
                 [i, w] = output_indent(indent, i);
             }
             output_spaces("\n", indent -= 2);
-            output_pretty(tokens[last]);
+            output_pretty(token(last));
             return [last, breakLength];
         }
         print_rec(val, 0);
@@ -1467,13 +1494,13 @@ import * as bjson from "qjs:bjson";
             help();
             return true;
         }
-        if (a[0] !== '\\' && a[0] !== '.')
+        if (a[1] !== '\\' && a[1] !== '.')
             return false;
         var pos = 1;
-        while (pos < a.length && a[pos] !== ' ') {
+        while (pos < a.length && char_at(a, pos) !== ' ') {
             pos++;
         }
-        var cmd = a.substring(1, pos);
+        var cmd = substring(a, 1, pos);
         var partial = 0;
         var fun;
         for (var p in directives) {
@@ -1487,7 +1514,7 @@ import * as bjson from "qjs:bjson";
             }
         }
         if (fun && partial < 2) {
-            fun(a.substring(pos).trim());
+            fun(substring(a, pos).trim());
         } else {
             std.puts(`Unknown directive: ${cmd}\n`);
         }
@@ -1572,8 +1599,8 @@ import * as bjson from "qjs:bjson";
                 return false;
         }
         var colorstate = colorize_js(expr);
-        pstate = colorstate[0];
-        level = colorstate[1];
+        pstate = colorstate[1];
+        level = colorstate[2];
         if (pstate) {
             mexpr = expr;
             return false;
@@ -1645,10 +1672,10 @@ import * as bjson from "qjs:bjson";
         var r = [];
 
         function push_state(c) { state += c; }
-        function last_state(c) { return state.substring(state.length - 1); }
+        function last_state(c) { return substring(state, state.length - 1); }
         function pop_state(c) {
             var c = last_state();
-            state = state.substring(0, state.length - 1);
+            state = substring(state, 0, state.length - 1);
             return c;
         }
 
@@ -1656,7 +1683,7 @@ import * as bjson from "qjs:bjson";
             style = 'comment';
             push_state('/');
             for (i++; i < n - 1; i++) {
-                if (str[i] == '*' && str[i + 1] == '/') {
+                if (char_at(str, i) == '*' && char_at(str, i + 1) == '/') {
                     i += 2;
                     pop_state('/');
                     break;
@@ -1667,7 +1694,7 @@ import * as bjson from "qjs:bjson";
         function parse_line_comment() {
             style = 'comment';
             for (i++; i < n; i++) {
-                if (str[i] == '\n') {
+                if (char_at(str, i) == '\n') {
                     break;
                 }
             }
@@ -1677,7 +1704,7 @@ import * as bjson from "qjs:bjson";
             style = 'string';
             push_state(delim);
             while (i < n) {
-                c = str[i++];
+                c = char_at(str, i++);
                 if (c == '\n') {
                     style = 'error';
                     continue;
@@ -1698,7 +1725,7 @@ import * as bjson from "qjs:bjson";
             style = 'regexp';
             push_state('/');
             while (i < n) {
-                c = str[i++];
+                c = char_at(str, i++);
                 if (c == '\n') {
                     style = 'error';
                     continue;
@@ -1718,13 +1745,13 @@ import * as bjson from "qjs:bjson";
                 }
                 if (c == '[') {
                     push_state('[');
-                    if (str[i] == '[' || str[i] == ']')
+                    if (char_at(str, i) == '[' || char_at(str, i) == ']')
                         i++;
                     continue;
                 }
                 if (c == '/') {
                     pop_state();
-                    while (i < n && is_word(str[i]))
+                    while (i < n && is_word(char_at(str, i)))
                         i++;
                     break;
                 }
@@ -1735,7 +1762,7 @@ import * as bjson from "qjs:bjson";
             style = 'number';
             // TODO(chqrlie) parse partial number syntax
             // TODO(chqrlie) special case bignum
-            while (i < n && (is_word(str[i]) || (str[i] == '.' && (i == n - 1 || str[i + 1] != '.')))) {
+            while (i < n && (is_word(char_at(str, i)) || (char_at(str, i) == '.' && (i == n - 1 || char_at(str, i + 1) != '.')))) {
                 i++;
             }
         }
@@ -1757,10 +1784,10 @@ import * as bjson from "qjs:bjson";
         function parse_identifier() {
             can_regex = 1;
 
-            while (i < n && is_word(str[i]))
+            while (i < n && is_word(char_at(str, i)))
                 i++;
 
-            var s = str.substring(start, i);
+            var s = substring(str, start, i);
             var w = '|' + s + '|';
 
             if (js_keywords.indexOf(w) >= 0) {
@@ -1779,10 +1806,10 @@ import * as bjson from "qjs:bjson";
             }
 
             var i1 = i;
-            while (i1 < n && str[i1] == ' ')
+            while (i1 < n && char_at(str, i1) == ' ')
                 i1++;
 
-            if (i1 < n && str[i1] == '(') {
+            if (i1 < n && char_at(str, i1) == '(') {
                 style = 'function';
                 return;
             }
@@ -1806,7 +1833,7 @@ import * as bjson from "qjs:bjson";
         for (i = 0; i < n;) {
             style = null;
             start = i;
-            switch (c = str[i++]) {
+            switch (c = char_at(str, i++)) {
             case ' ':
             case '\t':
             case '\r':
@@ -1814,18 +1841,18 @@ import * as bjson from "qjs:bjson";
                 continue;
             case '+':
             case '-':
-                if (i < n && str[i] == c) {
+                if (i < n && char_at(str, i) == c) {
                     i++;
                     continue;
                 }
                 can_regex = 1;
                 continue;
             case '/':
-                if (i < n && str[i] == '*') { // block comment
+                if (i < n && char_at(str, i) == '*') { // block comment
                     parse_block_comment();
                     break;
                 }
-                if (i < n && str[i] == '/') { // line comment
+                if (i < n && char_at(str, i) == '/') { // line comment
                     parse_line_comment();
                     break;
                 }
@@ -1882,7 +1909,7 @@ import * as bjson from "qjs:bjson";
 
     function config_file(s) {
         var xdg_state_home = std.getenv("XDG_STATE_HOME");
-        if (xdg_state_home && xdg_state_home[0] === "/") return xdg_state_home + "/" + s;
+        if (xdg_state_home && xdg_state_home[1] === "/") return xdg_state_home + "/" + s;
         var home = std.getenv("HOME");
         if (os.platform === "linux" && home) xdg_state_home = home + "/.local/state";
         if (os.stat(xdg_state_home + "/")[1] === 0) return xdg_state_home + "/" + s;
@@ -1914,7 +1941,7 @@ import * as bjson from "qjs:bjson";
             }
         }
         s = std.getenv("NO_COLOR"); // https://no-color.org/
-        if (s && +s[0] !== 0) {
+        if (s && +s[1] !== 0) {
             show_colors = false;
         }
     }
