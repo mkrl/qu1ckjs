@@ -7,6 +7,7 @@ const resetButton = document.querySelector("#reset");
 const themeToggle = document.querySelector("#theme-toggle");
 const runtimeState = document.querySelector(".runtime-state");
 const runtimeLabel = document.querySelector("#runtime-label");
+const mobileCursorControls = document.querySelector(".mobile-cursor-controls");
 
 function cssVar(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -45,8 +46,15 @@ const terminal = new Terminal({
   theme: terminalTheme(),
 });
 const history = [];
+const startupExamples = [
+  'const a = ["first", "second", "third"]',
+  "a[1]",
+  "a[0]",
+  "a.length",
+];
 let historyIndex = 0;
 let historyDraft = "";
+let startupExampleIndex = 0;
 let input = "";
 let renderedRows = 1;
 let renderedCursorRow = 0;
@@ -155,6 +163,15 @@ function submitInput() {
   worker.postMessage({ type: "eval", source: code });
 }
 
+function runNextStartupExample() {
+  if (startupExampleIndex >= startupExamples.length)
+    return;
+  input = startupExamples[startupExampleIndex++];
+  cursorIndex = Array.from(input).length;
+  renderInput();
+  submitInput();
+}
+
 function moveHistory(delta) {
   if (historyIndex === history.length)
     historyDraft = input;
@@ -169,11 +186,13 @@ worker.addEventListener("message", ({ data }) => {
     writeLine("Remember: things start at 1. Have fun.", "\x1b[1;34m");
     terminal.write("\r\n");
     setReady(true);
+    runNextStartupExample();
   } else if (data.type === "stdout" || data.type === "stderr") {
     writeLine(data.text, data.type === "stderr" ? "\x1b[31m" : "");
   } else if (data.type === "result") {
     writeLine(data.value, data.failed ? "\x1b[31m" : "\x1b[32m");
     setReady(true);
+    runNextStartupExample();
   } else if (data.type === "reset") {
     writeLine("Runtime reset", "\x1b[90m");
     setReady(true);
@@ -184,7 +203,7 @@ worker.addEventListener("message", ({ data }) => {
   }
 });
 
-terminal.onData((data) => {
+function handleTerminalInput(data) {
   if (pending)
     return;
 
@@ -244,7 +263,30 @@ terminal.onData((data) => {
     input = characters.join("");
     renderInput();
   }
-});
+}
+
+terminal.onData(handleTerminalInput);
+
+const terminalKeyInputs = {
+  left: "\x1b[D",
+  up: "\x1b[A",
+  down: "\x1b[B",
+  right: "\x1b[C",
+};
+
+for (const button of mobileCursorControls.querySelectorAll("button")) {
+  button.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    handleTerminalInput(terminalKeyInputs[button.dataset.terminalKey]);
+    terminal.focus();
+  });
+  button.addEventListener("click", (event) => {
+    if (event.detail === 0) {
+      handleTerminalInput(terminalKeyInputs[button.dataset.terminalKey]);
+      terminal.focus();
+    }
+  });
+}
 
 terminal.attachCustomKeyEventHandler((event) => {
   if (event.type === "keydown" && event.key === "Enter" && event.shiftKey) {
