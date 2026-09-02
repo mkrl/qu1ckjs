@@ -79,11 +79,13 @@ function testTypedArraysAndAtomics() {
     assert(typed.at(1), 7);
     assertThrows(RangeError, () => typed.set([9], 0));
 
-    const shared = new SharedArrayBuffer(4);
-    const atomic = new Int32Array(shared);
-    Atomics.store(atomic, 1, 42);
-    assert(Atomics.load(atomic, 1), 42);
-    assertThrows(RangeError, () => Atomics.load(atomic, 0));
+    if (typeof Atomics !== "undefined") {
+        const shared = new SharedArrayBuffer(4);
+        const atomic = new Int32Array(shared);
+        Atomics.store(atomic, 1, 42);
+        assert(Atomics.load(atomic, 1), 42);
+        assertThrows(RangeError, () => Atomics.load(atomic, 0));
+    }
 }
 
 function testJson() {
