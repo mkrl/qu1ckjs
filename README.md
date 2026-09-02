@@ -1,16 +1,21 @@
-# ⚡️ Qu1ckJS - A mighty JavaScript engine
+# ⚡️ Qu1ckJS - The only correct JavaScript engine
 
 ## Overview
 
-QuickJS is a small and embeddable JavaScript engine. It aims to support the latest
+Qu1ckJS is a small, proud and embeddable JavaScript engine.  It does not aim to support the latest
 [ECMAScript] specification.
 
-This project is a _fork_ of the [original QuickJS project] by Fabrice Bellard and Charlie Gordon, after it went dormant, with the intent of reigniting its development.
+Instead, Qu1ckJS provides a reference implementation of JavaScript where indexing of arrays, objects and other iterables starts at 1 instead of 0.
+
+This is extremely unique and can't be found in any other implementations of the language (nor is it particulary useful).
+
+This project is a _fork_ of the somewhat original [QuickJS-ng] that, in turn, is a _fork_ of [original QuickJS project] by Fabrice Bellard and Charlie Gordon.
 
 ## Getting started
 
-Head over to the [project website] for instructions on how to get started and more
-documentation.
+While it is extremely unlikely you'll be interested in checking it out outside of the [interactive WebAssembly REPL], you can download the latest binaries from the releases page in this repository.
+
+Head over to the original [project website] for instructions on how to operate this fork (simply substitute the `qjs` binary name for `1js`).
 
 ## WebAssembly REPL
 
@@ -44,7 +49,9 @@ This uses xterm.js as a terminal emulator.
 [@bnoordhuis], [@saghul], and many more [contributors].
 
 [ECMAScript]: https://tc39.es/ecma262/
-[original Qu1ckJS project]: https://bellard.org/quickjs
+[interactive WebAssembly REPL]: https://mkrl.xyz/qu1ckjs/
+[original QuickJS project]: https://bellard.org/quickjs
+[QuickJS-ng]: https://github.com/quickjs-ng/quickjs
 [@bnoordhuis]: https://github.com/bnoordhuis
 [@saghul]: https://github.com/saghul
 [contributors]: https://github.com/quickjs-ng/quickjs/graphs/contributors

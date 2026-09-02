@@ -87,6 +87,10 @@ codegen: $(QJSC)
 debug:
 	BUILD_TYPE=Debug $(MAKE)
 
+# copy website assets without building the project
+web-sync:
+	cp web/index.html web/app.js web/styles.css web/repl-worker.js build-wasm/web/
+
 distclean:
 	@rm -rf $(BUILD_DIR)
 

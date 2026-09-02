@@ -4,8 +4,31 @@ import { FitAddon } from "https://unpkg.com/@xterm/addon-fit@0.11.0/lib/addon-fi
 const terminalHost = document.querySelector("#terminal");
 const clearButton = document.querySelector("#clear");
 const resetButton = document.querySelector("#reset");
+const themeToggle = document.querySelector("#theme-toggle");
 const runtimeState = document.querySelector(".runtime-state");
 const runtimeLabel = document.querySelector("#runtime-label");
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function terminalTheme() {
+  return {
+    background: cssVar("--term-bg"),
+    foreground: cssVar("--term-fg"),
+    cursor: cssVar("--term-cursor"),
+    cursorAccent: cssVar("--term-bg"),
+    selectionBackground: cssVar("--term-selection"),
+    black: cssVar("--term-black"),
+    red: cssVar("--red"),
+    green: cssVar("--green"),
+    yellow: cssVar("--term-yellow"),
+    blue: cssVar("--term-blue"),
+    magenta: cssVar("--term-magenta"),
+    cyan: cssVar("--term-cyan"),
+    white: cssVar("--term-white"),
+  };
+}
 
 const worker = new Worker("./repl-worker.js", { type: "module" });
 const fitAddon = new FitAddon();
@@ -14,26 +37,12 @@ const terminal = new Terminal({
   convertEol: true,
   cursorBlink: true,
   cursorStyle: "bar",
-  fontFamily: '"Berkeley Mono", "Iosevka", "SFMono-Regular", monospace',
+  fontFamily: '"Berkeley Mono", "Iosevka", "SFMono-Regular", ui-monospace, monospace',
   fontSize: 14,
   lineHeight: 1.45,
   screenReaderMode: true,
   scrollback: 5000,
-  theme: {
-    background: "#fbfaf6",
-    foreground: "#171817",
-    cursor: "#176f8f",
-    cursorAccent: "#fbfaf6",
-    selectionBackground: "#b9d6df99",
-    black: "#171817",
-    red: "#d84a3a",
-    green: "#27734f",
-    yellow: "#a87305",
-    blue: "#176f8f",
-    magenta: "#8a4f7d",
-    cyan: "#16706f",
-    white: "#f3f0e8",
-  },
+  theme: terminalTheme(),
 });
 const history = [];
 let historyIndex = 0;
@@ -266,4 +275,26 @@ resetButton.addEventListener("click", () => {
   renderedRows = 0;
   setReady(false, "Resetting runtime", false);
   worker.postMessage({ type: "reset" });
+});
+
+function applyTheme(theme, save) {
+  document.documentElement.dataset.theme = theme;
+  if (save) {
+    localStorage.setItem("qjs-theme", theme);
+    document.documentElement.dataset.themeSaved = "yes";
+  }
+  terminal.options.theme = terminalTheme();
+  document
+    .querySelector('meta[name="theme-color"]')
+    .setAttribute("content", cssVar("--paper"));
+}
+
+themeToggle.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(next, true);
+});
+
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+  if (document.documentElement.dataset.themeSaved !== "yes")
+    applyTheme(event.matches ? "dark" : "light", false);
 });

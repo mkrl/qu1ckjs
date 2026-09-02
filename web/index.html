@@ -3,31 +3,85 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f3f0e8">
-  <title>Qu1ckJS Web REPL</title>
+  <meta name="theme-color" content="#f6f5f1">
+  <title>Qu1ckJS — Web REPL</title>
   <link rel="stylesheet" href="https://unpkg.com/@xterm/xterm@6.0.0/css/xterm.css">
   <link rel="stylesheet" href="./styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    (function () {
+      var saved = localStorage.getItem("qjs-theme");
+      var theme = saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.dataset.themeSaved = saved ? "yes" : "no";
+    })();
+  </script>
 </head>
 <body>
   <main class="shell">
-    <header class="masthead">
-      <div>
-        <p class="eyebrow">When 0 doesn't quite cut it</p>
-        <h1>Qu1ckJS <span>Web REPL</span></h1>
-      </div>
+    <header class="topbar">
+      <a class="logo" href="./" aria-label="Qu1ckJS home">
+        Qu<em>1</em>ckJS
+      </a>
+
       <div class="runtime-state" data-state="loading">
         <i aria-hidden="true"></i>
         <span id="runtime-label">Loading engine</span>
       </div>
+
+      <nav class="topnav" aria-label="Site">
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/mkrl/qu1ckjs" target="_blank" rel="noopener">
+          GitHub
+          <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="currentColor">
+            <path d="M4.5 3h6.7a.8.8 0 0 1 .8.8v6.7h-1.6V5.4L4.4 11.4 3.3 10.3l6-6H4.5V3Z"/>
+          </svg>
+        </a>
+        <button id="theme-toggle" type="button" aria-label="Toggle color theme" title="Toggle color theme">
+          <svg class="icon-sun" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <circle cx="8" cy="8" r="3.2"/>
+            <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3 3l1.1 1.1M11.9 11.9 13 13M13 3l-1.1 1.1M4.1 11.9 3 13"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="currentColor">
+            <path d="M13.4 9.4A5.6 5.6 0 0 1 6.6 2.6a5.6 5.6 0 1 0 6.8 6.8Z"/>
+          </svg>
+        </button>
+      </nav>
     </header>
 
     <section class="terminal-frame" aria-label="JavaScript REPL">
       <div id="terminal"></div>
     </section>
 
-    <footer class="actions">
-      <button id="clear" type="button">Clear output</button>
+    <div class="actions">
+      <button id="clear" type="button">Clear</button>
       <button id="reset" type="button" disabled>Reset runtime</button>
+      <span class="hint">Enter to run · Shift+Enter for newline · ↑↓ history</span>
+    </div>
+
+    <section class="faq" id="faq">
+      <h2>FAQ</h2>
+      <details>
+        <summary>What is Qu1ckJS?</summary>
+        <p>Qu1ckJS is the only correct JavaScript engine where indexing of arrays, objects and other iterables starts at 1 (as it should have been from the beginning). </p>
+      </details>
+      <details>
+        <summary>Why does indexing start at 1?</summary>
+        <p>You don't say "this is my zeroth coke of the day".</p>
+      </details>
+      <details>
+        <summary>Can I contribute?</summary>
+        <p>If you are serious about your contribution to support one-based indexing, spread the word! Don't let the big tech dictate how we count. We can still win if we stay united.</p>
+      </details>
+      <details>
+        <summary>How?</summary>
+        <p>Based on originally incorrectly designed <a href="https://github.com/quickjs-ng/quickjs">QuickJS-ng</a> that is a fork of the original <a href="https://bellard.org/quickjs/">QuickJS</a> by Fabrice Bellard and Charlie Gordon. We thank everyone involved in the development of these projects, laying the groundwork for the first of many JavaScript engines that get it right.</p>
+      </details>
+    </section>
+
+    <footer class="foot">
+      <span>Qu1ckJS — The only correct JavaScript engine</span>
+      <a href="https://github.com/mkrl/qu1ckjs" target="_blank">mkrl/qu1ckjs</a>
     </footer>
   </main>
   <script type="module" src="./app.js"></script>
