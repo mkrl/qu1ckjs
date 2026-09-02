@@ -1,18 +1,18 @@
-.TH QJS 1 "2026-07-22"
+.TH 1JS 1 "2026-07-22"
 .SH NAME
-qjs - QuickJS-NG JavaScript interpreter
+1js - Qu1ckJS JavaScript interpreter
 
 .SH SYNOPSIS
-.SY qjs
+.SY 1js
 .RI [ OPTION ].\|.\|.\&
 .RI [ FILE " [" ARGUMENT ].\|.\|.]
 .YS
 
 .SH DESCRIPTION
-QuickJS-NG is a small and embeddable JavaScript engine.
+Qu1ckJS is a small and embeddable JavaScript engine.
 It aims to support the latest ECMAScript specification.
 .PP
-The \fBqjs\fR executable runs the JavaScript interpreter.
+The \fB1js\fR executable runs the JavaScript interpreter.
 It includes a simple standard library and REPL.
 
 .SH OPTIONS
@@ -23,7 +23,7 @@ Compile \fIFILE\fR into a standalone executable, bundling the interpreter and th
 .TP
 .B \-C\fR,\fP \-\-script
 Load \fIFILE\fR as a classic JavaScript script.
-By default, \fBqjs\fR will try to detect if \fIFILE\fR is a JS script or an ES module.
+By default, \fB1js\fR will try to detect if \fIFILE\fR is a JS script or an ES module.
 
 .TP
 .B \-d\fR,\fP \-\-dump
@@ -57,7 +57,7 @@ Limit memory usage to \fIN\fR Kbytes.
 .TP
 .B \-m\fR,\fP \-\-module
 Load \fIFILE\fR as an ECMAScript module.
-By default, \fBqjs\fR will try to detect if \fIFILE\fR is a JS script or an ES module.
+By default, \fB1js\fR will try to detect if \fIFILE\fR is a JS script or an ES module.
 
 .TP
 \fB\-\-o\fR \fIOUTPUT\fR, \fB\-\-out\fR \fIOUTPUT\fR

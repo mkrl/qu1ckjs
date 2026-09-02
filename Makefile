@@ -28,7 +28,7 @@ BUILD_DIR?=build
 BUILD_TYPE?=Release
 INSTALL_PREFIX?=/usr/local
 
-QJS=$(BUILD_DIR)/qjs
+QJS=$(BUILD_DIR)/1js
 QJSC=$(BUILD_DIR)/qjsc
 RUN262=$(BUILD_DIR)/run-test262
 

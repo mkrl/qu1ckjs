@@ -137,7 +137,7 @@ import * as bjson from "qjs:bjson";
     var pstate = "";
     var prompt = "";
     var plen = 0;
-    var ps1 = "qjs > ";
+    var ps1 = "1js > ";
     var ps2 = "  ... ";
     var eval_start_time;
     var eval_time = 0;
@@ -1574,7 +1574,7 @@ import * as bjson from "qjs:bjson";
     }, null);
 
     function cmd_start() {
-        std.puts('QuickJS-ng - Type ".help" for help\n');
+        std.puts('Qu1ckJS - Type ".help" for help\n');
         cmd_readline_start();
     }
 

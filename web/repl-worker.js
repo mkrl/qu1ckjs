@@ -1,4 +1,4 @@
-import createQuickJS from "./qjs.js";
+import createQuickJS from "./1js.js";
 
 let quickJS;
 
@@ -10,7 +10,7 @@ async function initialize() {
   });
   const status = quickJS.ccall("qjs_browser_init", "number", [], []);
   if (status !== 0)
-    throw new Error("QuickJS failed to initialize");
+    throw new Error("Qu1ckJS failed to initialize");
 }
 
 async function reset() {

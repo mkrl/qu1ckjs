@@ -241,7 +241,7 @@ endif
 if host_system == 'emscripten'
   qjs_wasm_export_name = 'getQuickJs'
   executable(
-    'qjs_wasm',
+    '1js_wasm',
     qjs_srcs,
     link_args: cc.get_supported_link_arguments(
       # in emscripten 3.x, this will be set to 16k which is too small for quickjs.
@@ -290,7 +290,7 @@ import('pkgconfig').generate(
   qjs_lib,
   subdirs: 'quickjs-ng',
   name: 'quickjs-ng',
-  description: 'QuickJS, the Next Generation: a mighty JavaScript engine',
+  description: 'Qu1ckJS, the Next Generation: a mighty JavaScript engine',
   url: 'https://github.com/quickjs-ng/quickjs',
   version: meson.project_version(),
   variables: qjs_export_variables,
@@ -331,7 +331,7 @@ qjs_exe_srcs = files(
   'qjs.c',
 )
 qjs_exe = executable(
-  'qjs',
+  '1js',
   qjs_exe_srcs,
 
   c_args: qjs_c_args,
@@ -388,7 +388,7 @@ if meson.is_cross_build()
   meson.override_find_program(
     'qjs',
     executable(
-      'qjs_native',
+      '1js_native',
       qjs_exe_srcs,
 
       c_args: qjs_c_args,

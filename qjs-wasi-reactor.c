@@ -38,7 +38,7 @@ int qjs_init_argv(int argc, char **argv);
 __attribute__((export_name("qjs_init")))
 int qjs_init(void)
 {
-    static char *empty_argv[] = { "qjs", NULL };
+    static char *empty_argv[] = { "1js", NULL };
     return qjs_init_argv(1, empty_argv);
 }
 

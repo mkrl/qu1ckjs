@@ -213,7 +213,7 @@ static JSValue js_gc(JSContext *ctx, JSValueConst this_val,
 static JSValue js_navigator_get_userAgent(JSContext *ctx, JSValueConst this_val)
 {
     char version[32];
-    snprintf(version, sizeof(version), "quickjs-ng/%s", JS_GetVersion());
+    snprintf(version, sizeof(version), "Qu1ckJS/%s", JS_GetVersion());
     return JS_NewString(ctx, version);
 }
 
@@ -377,11 +377,11 @@ static const JSMallocFunctions mi_mf = {
 };
 #endif
 
-#define PROG_NAME "qjs"
+#define PROG_NAME "1js"
 
 void help(int exit_status)
 {
-    printf("QuickJS-ng version %s\n"
+    printf("Qu1ckJS version %s\n"
            "usage: " PROG_NAME " [options] [file [args]]\n"
            "-h  --help         list options\n"
            "-v  --version      print version string and then exit\n"
@@ -484,7 +484,7 @@ int main(int argc, char **argv)
             if (opt == 'e' || !strcmp(longopt, "eval")) {
                 if (!optarg) {
                     if (optind >= argc) {
-                        fprintf(stderr, "qjs: missing expression for -e\n");
+                        fprintf(stderr, PROG_NAME ": missing expression for -e\n");
                         exit(1);
                     }
                     optarg = argv[optind++];
@@ -562,7 +562,7 @@ int main(int argc, char **argv)
                     (opt == 'c' || !strcmp(longopt, "compile"))) {
                 if (!optarg) {
                     if (optind >= argc) {
-                        fprintf(stderr, "qjs: missing file for -c\n");
+                        fprintf(stderr, PROG_NAME ": missing file for -c\n");
                         exit(1);
                     }
                     optarg = argv[optind++];
@@ -573,7 +573,7 @@ int main(int argc, char **argv)
             if (!emscripten_or_wasi && (opt == 'o' || !strcmp(longopt, "out"))) {
                 if (!optarg) {
                     if (optind >= argc) {
-                        fprintf(stderr, "qjs: missing file for -o\n");
+                        fprintf(stderr, PROG_NAME ": missing file for -o\n");
                         exit(1);
                     }
                     optarg = argv[optind++];

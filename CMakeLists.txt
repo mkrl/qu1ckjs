@@ -32,9 +32,9 @@ xoption(BUILD_SHARED_LIBS "Build a shared library" OFF)
 xoption(QJS_ENABLE_INSTALL "Enable quickjs installation" ON)
 xoption(QJS_BUILD_WERROR "Build with -Werror" OFF)
 xoption(QJS_BUILD_EXAMPLES "Build examples" OFF)
-xoption(QJS_BUILD_CLI_STATIC "Build a static qjs executable" OFF)
-xoption(QJS_BUILD_CLI_WITH_MIMALLOC "Build the qjs executable with mimalloc" OFF)
-xoption(QJS_BUILD_CLI_WITH_STATIC_MIMALLOC "Build the qjs executable with mimalloc (statically linked)" OFF)
+xoption(QJS_BUILD_CLI_STATIC "Build a static 1js executable" OFF)
+xoption(QJS_BUILD_CLI_WITH_MIMALLOC "Build the 1js executable with mimalloc" OFF)
+xoption(QJS_BUILD_CLI_WITH_STATIC_MIMALLOC "Build the 1js executable with mimalloc (statically linked)" OFF)
 xoption(QJS_DISABLE_PARSER "Disable JS source code parser" OFF)
 xoption(QJS_ENABLE_ASAN "Enable AddressSanitizer (ASan)" OFF)
 xoption(QJS_ENABLE_MSAN "Enable MemorySanitizer (MSan)" OFF)
@@ -348,7 +348,7 @@ if(EMSCRIPTEN)
     add_executable(qjs_browser qjs-browser.c)
     add_qjs_libc_if_needed(qjs_browser)
     set_target_properties(qjs_browser PROPERTIES
-        OUTPUT_NAME "qjs"
+        OUTPUT_NAME "1js"
         SUFFIX ".js"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/web"
     )
@@ -402,9 +402,9 @@ add_executable(qjs_exe
 add_qjs_libc_if_needed(qjs_exe)
 add_static_if_needed(qjs_exe)
 set_target_properties(qjs_exe PROPERTIES
-    OUTPUT_NAME "qjs"
-    PDB_NAME "qjs_cli"
-    COMPILE_PDB_NAME "qjs_cli"
+    OUTPUT_NAME "1js"
+    PDB_NAME "1js_cli"
+    COMPILE_PDB_NAME "1js_cli"
 )
 target_compile_definitions(qjs_exe PRIVATE ${qjs_defines})
 target_link_libraries(qjs_exe PRIVATE qjs)
@@ -423,7 +423,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "WASI")
             qjs-wasi-reactor.c
         )
         set_target_properties(qjs_wasi PROPERTIES
-            OUTPUT_NAME "qjs"
+            OUTPUT_NAME "1js"
             SUFFIX ".wasm"
         )
         target_compile_definitions(qjs_wasi PRIVATE ${qjs_defines})
@@ -578,7 +578,7 @@ if (QJS_ENABLE_INSTALL)
     if(NOT IOS AND NOT TVOS AND NOT WATCHOS)
         install(TARGETS qjs_exe RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
         install(TARGETS qjsc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-        install(FILES qjs.man DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1 RENAME qjs.1)
+        install(FILES qjs.man DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1 RENAME 1js.1)
         install(FILES qjsc.man DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1 RENAME qjsc.1)
     endif()
     install(TARGETS qjs EXPORT qjsConfig

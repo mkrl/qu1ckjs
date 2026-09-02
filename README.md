@@ -1,4 +1,4 @@
-# ⚡️ QuickJS - A mighty JavaScript engine
+# ⚡️ Qu1ckJS - A mighty JavaScript engine
 
 ## Overview
 
@@ -44,7 +44,7 @@ This uses xterm.js as a terminal emulator.
 [@bnoordhuis], [@saghul], and many more [contributors].
 
 [ECMAScript]: https://tc39.es/ecma262/
-[original QuickJS project]: https://bellard.org/quickjs
+[original Qu1ckJS project]: https://bellard.org/quickjs
 [@bnoordhuis]: https://github.com/bnoordhuis
 [@saghul]: https://github.com/saghul
 [contributors]: https://github.com/quickjs-ng/quickjs/graphs/contributors

@@ -1,6 +1,6 @@
 .TH QJSC 1 "2026-07-22"
 .SH NAME
-qjsc - QuickJS-NG bytecode compiler
+qjsc - Qu1ckJS bytecode compiler
 
 .SH SYNOPSIS
 .SY qjsc
@@ -9,12 +9,12 @@ qjsc - QuickJS-NG bytecode compiler
 .YS
 
 .SH DESCRIPTION
-QuickJS-NG is a small and embeddable JavaScript engine.
+Qu1ckJS is a small and embeddable JavaScript engine.
 It aims to support the latest ECMAScript specification.
 .PP
 The \fBqjsc\fR executable runs the JavaScript compiler.
 It can generate bytecode from source files which can then be embedded in an executable,
-or it can generate the necessary scaffolding to build a C application which embeds QuickJS.
+or it can generate the necessary scaffolding to build a C application which embeds Qu1ckJS.
 
 .SH OPTIONS
 .TP
@@ -73,6 +73,6 @@ Set the maximum stack size to \fIN\fR bytes (default is 1 048 576).
 
 .SH SEE ALSO
 .SS "Man pages"
-.BR qjs (1)
+.BR 1js (1)
 .SS "Online documentation"
 Detailed documentation about the project can be found at: https://quickjs-ng.github.io/quickjs/

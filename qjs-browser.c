@@ -99,7 +99,7 @@ const char *qjs_browser_eval(const char *source)
     browser_eval_failed = 0;
     if (!browser_rt && qjs_browser_init()) {
         browser_eval_failed = 1;
-        return browser_set_result("Unable to initialize QuickJS");
+        return browser_set_result("Unable to initialize Qu1ckJS");
     }
     if (!source)
         source = "";
