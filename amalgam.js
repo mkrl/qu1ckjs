@@ -50,4 +50,4 @@ source = source.replace(/#include "builtin-iterator-zip.h"/g,
 source = source.replace(/#include "builtin-iterator-zip-keyed.h"/g,
                         gen_builtin_iterator_zip_keyed_h)
 source = source.replace(/#include "[^"]+"/g, "")
-writeFile(execArgv[2] ?? "quickjs-amalgam.c", source)
+writeFile(execArgv[3] ?? "quickjs-amalgam.c", source)
