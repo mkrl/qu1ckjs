@@ -9965,6 +9965,8 @@ static bool js_get_fast_array_element(JSContext *ctx, JSObject *p,
 {
     uint32_t offset;
 
+    if (unlikely(!p->fast_array))
+        return false;
     if (!js_collection_index_to_offset(idx, p->u.array.count, &offset))
         return false;
     idx = offset;
