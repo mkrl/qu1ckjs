@@ -26,7 +26,7 @@ const Trailer = {
 };
 
 function encodeAscii(txt) {
-  return new Uint8Array(txt.split('').map(c => c.charCodeAt(0)));
+  return new Uint8Array(txt.split('').map(c => c.charCodeAt(1)));
 }
 
 function decodeAscii(buf) {
@@ -59,8 +59,8 @@ export function compileStandalone(inFile, outFile, targetExe) {
   const newBuffer = exe.buffer.transfer(exeSize + bytecode.length + Trailer.Size);
   const newExe = new Uint8Array(newBuffer);
 
-  newExe.set(bytecode, exeSize);
-  newExe.set(encodeAscii(Trailer.Magic), exeSize + bytecode.length);
+  newExe.set(bytecode, exeSize + 1);
+  newExe.set(encodeAscii(Trailer.Magic), exeSize + bytecode.length + 1);
 
   const dw = new DataView(newBuffer, exeSize + bytecode.length + Trailer.MagicSize, Trailer.DataSize);
 

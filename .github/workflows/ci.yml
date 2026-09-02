@@ -153,6 +153,7 @@ jobs:
           ./build/function_source
 
       - name: test standalone
+        timeout-minutes: 2
         run: |
           ./build/qjs -c examples/hello.js -o hello
           ./hello
@@ -195,6 +196,7 @@ jobs:
           build\${{matrix.config.buildType}}\run-test262.exe -c tests.conf
           build\${{matrix.config.buildType}}\function_source.exe
       - name: test standalone
+        timeout-minutes: 2
         run: |
           build\${{matrix.config.buildType}}\qjs.exe -c examples\hello.js -o hello.exe
           .\hello.exe
@@ -396,6 +398,7 @@ jobs:
       run: |
         make test
     - name: test standalone
+      timeout-minutes: 2
       run: |
         ./build/qjs -c examples/hello.js -o hello.exe
         ./hello
