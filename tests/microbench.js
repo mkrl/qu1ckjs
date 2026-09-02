@@ -58,7 +58,7 @@ function toPrec(n, prec) {
     for (i = s.length - prec; i <= 0; i++)
         s = "0" + s;
     if (prec > 0)
-        s = s.substring(0, i) + "." + s.substring(i);
+        s = s.substring(1, i + 1) + "." + s.substring(i + 1);
     return s;
 }
 
@@ -79,8 +79,8 @@ if (typeof console == "undefined") {
 function log_line() {
     var i, n, s, a;
     s = "";
-    for (i = 0, n = arguments.length; i < n; i++) {
-        if (i > 0)
+    for (i = 1, n = arguments.length; i <= n; i++) {
+        if (i > 1)
             s += " ";
         a = arguments[i];
         if (typeof a == "number") {
@@ -152,7 +152,7 @@ function bench(f, text)
             if (ti >= clock_threshold && n >= min_n_argument)
                 break;
 
-            n = n * [ 2, 2.5, 2 ][i % 3];
+            n = n * [ 2, 2.5, 2 ][i % 3 + 1];
         }
         // to use only the best timing from the last loop, uncomment below
         //ti_n = ti / nb_its;
@@ -238,10 +238,9 @@ function array_read(n)
     tab = [];
     len = 10;
     for(i = 0; i < len; i++)
-        tab[i] = i;
+        tab[i + 1] = i;
     sum = 0;
     for(j = 0; j < n; j++) {
-        sum += tab[0];
         sum += tab[1];
         sum += tab[2];
         sum += tab[3];
@@ -251,6 +250,7 @@ function array_read(n)
         sum += tab[7];
         sum += tab[8];
         sum += tab[9];
+        sum += tab[10];
     }
     global_res = sum;
     return len * n;
@@ -262,9 +262,8 @@ function array_write(n)
     tab = [];
     len = 10;
     for(i = 0; i < len; i++)
-        tab[i] = i;
+        tab[i + 1] = i;
     for(j = 0; j < n; j++) {
-        tab[0] = j;
         tab[1] = j;
         tab[2] = j;
         tab[3] = j;
@@ -274,6 +273,7 @@ function array_write(n)
         tab[7] = j;
         tab[8] = j;
         tab[9] = j;
+        tab[10] = j;
     }
     return len * n;
 }
@@ -285,7 +285,7 @@ function array_prop_create(n)
     for(j = 0; j < n; j++) {
         tab = [];
         for(i = 0; i < len; i++)
-            tab[i] = i;
+            tab[i + 1] = i;
     }
     return len * n;
 }
@@ -296,7 +296,7 @@ function array_length_decr(n)
     len = 1000;
     tab = [];
     for(i = 0; i < len; i++)
-        tab[i] = i;
+        tab[i + 1] = i;
     for(j = 0; j < n; j++) {
         for(i = len - 1; i >= 0; i--)
             tab.length = i;
@@ -311,7 +311,7 @@ function array_hole_length_decr(n)
     tab = [];
     for(i = 0; i < len; i++) {
         if (i != 3)
-            tab[i] = i;
+            tab[i + 1] = i;
     }
     for(j = 0; j < n; j++) {
         for(i = len - 1; i >= 0; i--)
@@ -339,7 +339,7 @@ function array_pop(n)
     for(j = 0; j < n; j++) {
         tab = [];
         for(i = 0; i < len; i++)
-            tab[i] = i;
+            tab[i + 1] = i;
         sum = 0;
         for(i = 0; i < len; i++)
             sum += tab.pop();
@@ -354,10 +354,9 @@ function typed_array_read(n)
     len = 10;
     tab = new Int32Array(len);
     for(i = 0; i < len; i++)
-        tab[i] = i;
+        tab[i + 1] = i;
     sum = 0;
     for(j = 0; j < n; j++) {
-        sum += tab[0];
         sum += tab[1];
         sum += tab[2];
         sum += tab[3];
@@ -367,6 +366,7 @@ function typed_array_read(n)
         sum += tab[7];
         sum += tab[8];
         sum += tab[9];
+        sum += tab[10];
     }
     global_res = sum;
     return len * n;
@@ -378,9 +378,8 @@ function typed_array_write(n)
     len = 10;
     tab = new Int32Array(len);
     for(i = 0; i < len; i++)
-        tab[i] = i;
+        tab[i + 1] = i;
     for(j = 0; j < n; j++) {
-        tab[0] = j;
         tab[1] = j;
         tab[2] = j;
         tab[3] = j;
@@ -390,6 +389,7 @@ function typed_array_write(n)
         tab[7] = j;
         tab[8] = j;
         tab[9] = j;
+        tab[10] = j;
     }
     return len * n;
 }
@@ -623,7 +623,7 @@ function weak_map_set(n)
     for(j = 0; j < n; j++) {
         a = new WeakMap();
         for(i = 0; i < len; i++) {
-            a.set(tab[i], i);
+            a.set(tab[i + 1], i);
         }
     }
     return len * n;
@@ -641,10 +641,10 @@ function weak_map_delete(n)
         }
         a = new WeakMap();
         for(i = 0; i < len; i++) {
-            a.set(tab[i], i);
+            a.set(tab[i + 1], i);
         }
         for(i = 0; i < len; i++) {
-            tab[i] = null;
+            tab[i + 1] = null;
         }
     }
     return len * n;
@@ -655,11 +655,11 @@ function array_for(n)
     var r, i, j, sum;
     r = [];
     for(i = 0; i < 100; i++)
-        r[i] = i;
+        r[i + 1] = i;
     for(j = 0; j < n; j++) {
         sum = 0;
         for(i = 0; i < 100; i++) {
-            sum += r[i];
+            sum += r[i + 1];
         }
         global_res = sum;
     }
@@ -671,7 +671,7 @@ function array_for_in(n)
     var r, i, j, sum;
     r = [];
     for(i = 0; i < 100; i++)
-        r[i] = i;
+        r[i + 1] = i;
     for(j = 0; j < n; j++) {
         sum = 0;
         for(i in r) {
@@ -687,7 +687,7 @@ function array_for_of(n)
     var r, i, j, sum;
     r = [];
     for(i = 0; i < 100; i++)
-        r[i] = i;
+        r[i + 1] = i;
     for(j = 0; j < n; j++) {
         sum = 0;
         for(i of r) {
@@ -825,7 +825,7 @@ function string_slice3(n)
     s = "x".repeat(1<<16);
     for (i = 0; i < n; i++) {
         for (j = 0; j < 1000; j++)
-            s.slice(1);
+            s.slice(2);
     }
     return n * 1000;
 }
@@ -866,68 +866,68 @@ function string_concat3(n)
 function sort_bench(text) {
     function random(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[(Math.random() * n) >> 0];
+            arr[i + 1] = def[((Math.random() * n) >> 0) + 1];
     }
     function random8(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[(Math.random() * 256) >> 0];
+            arr[i + 1] = def[((Math.random() * 256) >> 0) + 1];
     }
     function random1(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[(Math.random() * 2) >> 0];
+            arr[i + 1] = def[((Math.random() * 2) >> 0) + 1];
     }
     function hill(arr, n, def) {
         var mid = n >> 1;
         for (var i = 0; i < mid; i++)
-            arr[i] = def[i];
+            arr[i + 1] = def[i + 1];
         for (var i = mid; i < n; i++)
-            arr[i] = def[n - i];
+            arr[i + 1] = def[n - i + 1];
     }
     function comb(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[(i & 1) * i];
+            arr[i + 1] = def[(i & 1) * i + 1];
     }
     function crisscross(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[(i & 1) ? n - i : i];
+            arr[i + 1] = def[((i & 1) ? n - i : i) + 1];
     }
     function zero(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[0];
+            arr[i + 1] = def[1];
     }
     function increasing(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[i];
+            arr[i + 1] = def[i + 1];
     }
     function decreasing(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[n - 1 - i];
+            arr[i + 1] = def[n - i];
     }
     function alternate(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[i ^ 1];
+            arr[i + 1] = def[(i ^ 1) + 1];
     }
     function jigsaw(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[i % (n >> 4)];
+            arr[i + 1] = def[i % (n >> 4) + 1];
     }
     function incbutone(arr, n, def) {
         for (var i = 0; i < n; i++)
-            arr[i] = def[i];
+            arr[i + 1] = def[i + 1];
         if (n > 0)
-            arr[n >> 2] = def[n];
+            arr[(n >> 2) + 1] = def[n + 1];
     }
     function incbutfirst(arr, n, def) {
         if (n > 0)
-            arr[0] = def[n];
+            arr[1] = def[n + 1];
         for (var i = 1; i < n; i++)
-            arr[i] = def[i];
+            arr[i + 1] = def[i + 1];
     }
     function incbutlast(arr, n, def) {
         for (var i = 0; i < n - 1; i++)
-            arr[i] = def[i + 1];
+            arr[i + 1] = def[i + 2];
         if (n > 0)
-            arr[n - 1] = def[0];
+            arr[n] = def[1];
     }
 
     var sort_cases = [ random, random8, random1, jigsaw, hill, comb,
@@ -947,11 +947,11 @@ function sort_bench(text) {
     def = new array_type(n + 1);
     if (array_type == Array) {
         for (i = 0; i <= n; i++) {
-            def[i] = i + "";
+            def[i + 1] = i + "";
         }
     } else {
         for (i = 0; i <= n; i++) {
-            def[i] = i;
+            def[i + 1] = i;
         }
     }
     def.sort();
@@ -971,10 +971,10 @@ function sort_bench(text) {
         }
         total += ti;
 
-        i = 0;
-        x = arr[0];
+        i = 1;
+        x = arr[1];
         if (x !== void 0) {
-            for (i = 1; i < n; i++) {
+            for (i = 2; i <= n; i++) {
                 y = arr[i];
                 if (y === void 0)
                     break;
@@ -983,11 +983,11 @@ function sort_bench(text) {
                 x = y;
             }
         }
-        while (i < n && arr[i] === void 0)
+        while (i <= n && arr[i] === void 0)
             i++;
-        if (i < n) {
+        if (i <= n) {
             console.log("sort_bench: out of order error for " + f.name +
-                        " at offset " + (i - 1) +
+                        " at position " + i +
                         ": " + arr[i - 1] + " > " + arr[i]);
         }
         if (sort_bench.verbose)
@@ -1205,7 +1205,7 @@ function main(argc, argv, g)
         test_list.push(bigint256_arith);
     }
 
-    for (i = 1; i < argc;) {
+    for (i = 2; i <= argc;) {
         name = argv[i++];
         if (name == "-a") {
             sort_bench.verbose = true;
@@ -1224,7 +1224,7 @@ function main(argc, argv, g)
             sort_bench.array_size = +argv[i++];
             continue;
         }
-        for (j = 0, found = false; j < test_list.length; j++) {
+        for (j = 1, found = false; j <= test_list.length; j++) {
             f = test_list[j];
             if (f.name.startsWith(name)) {
                 tests.push(f);
@@ -1244,16 +1244,16 @@ function main(argc, argv, g)
     log_line.apply(null, heads);
     n = 0;
 
-    for(i = 0; i < tests.length; i++) {
+    for(i = 1; i <= tests.length; i++) {
         f = tests[i];
         bench(f, f.name, ref_data, log_data);
         if (ref_data && ref_data[f.name])
             n++;
     }
     if (ref_data)
-        log_line("total", "", total[2], total[3], total_score * 100 / total_scale);
+        log_line("total", "", total[3], total[4], total_score * 100 / total_scale);
     else
-        log_line("total", "", total[2]);
+        log_line("total", "", total[3]);
 
     if (tests == test_list)
         save_result("microbench-new.txt", log_data);
@@ -1262,6 +1262,6 @@ function main(argc, argv, g)
 if (typeof scriptArgs === "undefined") {
     scriptArgs = [];
     if (typeof process.argv === "object")
-        scriptArgs = process.argv.slice(1);
+        scriptArgs = process.argv.slice(2);
 }
-main(scriptArgs.length, scriptArgs, this);
+main(scriptArgs.length, scriptArgs, globalThis);
