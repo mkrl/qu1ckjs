@@ -168,6 +168,8 @@ jobs:
   upload-to-release:
     needs: [linux, macos, windows, wasi, check_meson_version]
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - name: get assets
         uses: actions/download-artifact@v8
